@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Péče Master – Akademie operátora</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap');
+  :root{
+    --sky1:#bfe6ff; --sky2:#eaf7ff;
+    --ink:#243b53; --ink2:#57708a;
+    --card:#ffffff; --cardline:#e1ecf6;
+    --brand:#ff8a5b; --brand2:#ff6f91;
+    --green:#39c07c; --greenD:#1f9d5f;
+    --red:#ff6b6b; --blue:#4f9dff; --purple:#9b7bff; --gold:#ffcf4d;
+    --shadow:0 14px 30px rgba(36,59,83,.14);
+    --shadowSoft:0 8px 18px rgba(36,59,83,.10);
+    --r:22px;
+    --f:'Baloo 2','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:var(--f);color:var(--ink);overflow:hidden;background:linear-gradient(180deg,var(--sky1),var(--sky2));-webkit-font-smoothing:antialiased}
+  #scene{position:fixed;inset:0;z-index:0;overflow:hidden}
+  .sun{position:absolute;top:-90px;right:-70px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,#fff2b8,#ffe27a 55%,rgba(255,226,122,0) 72%);animation:sunPulse 7s ease-in-out infinite}
+  @keyframes sunPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.06);opacity:1}}
+  .cloud{position:absolute;background:#fff;border-radius:50px;opacity:.9;filter:drop-shadow(0 10px 12px rgba(70,120,160,.12))}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud::before{width:60%;height:150%;top:-40%;left:12%}.cloud::after{width:45%;height:120%;top:-25%;right:12%}
+  @keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(120vw)}}
+  .hill{position:absolute;bottom:-40px;border-radius:50% 50% 0 0}
+  .h1{left:-10%;width:70%;height:230px;background:#cdeccb;opacity:.8}
+  .h2{right:-12%;width:75%;height:280px;background:#bce6c4;opacity:.9}
+  .h3{left:15%;width:60%;height:180px;background:#a9dfb6}
+  .bubble-bg{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);animation:floatUp linear infinite;bottom:-60px}
+  @keyframes floatUp{0%{transform:translateY(0) scale(.6);opacity:0}12%{opacity:.6}100%{transform:translateY(-115vh) scale(1);opacity:0}}
+
+  #app{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;max-width:1180px;margin:0 auto;padding:12px 14px 8px}
+  .screen{animation:screenIn .45s cubic-bezier(.22,1,.36,1)}
+  @keyframes screenIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .loginWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:14px}
+  .loginCard{background:var(--card);border:2px solid #fff;border-radius:28px;box-shadow:var(--shadow);width:100%;max-width:400px;padding:26px 26px 22px;text-align:center}
+  .logo{font-size:26px;font-weight:800}.logo .p{color:var(--brand)}
+  .logoSub{color:var(--ink2);font-weight:700;font-size:12.5px;margin-top:2px;margin-bottom:16px}
+  .lAv{width:120px;height:120px;margin:0 auto 6px}
+  .field{text-align:left;margin-bottom:11px}
+  .field label{font-size:12px;font-weight:800;color:var(--ink2);display:block;margin-bottom:4px;margin-left:4px}
+  .field input,.field select,.field textarea{width:100%;border:2px solid var(--cardline);border-radius:13px;padding:11px 13px;font-family:var(--f);font-weight:700;font-size:14px;color:var(--ink);background:#fbfdff;outline:none;transition:.15s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
+  .primary{width:100%;border:none;border-radius:15px;padding:13px;font-family:var(--f);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));cursor:pointer;box-shadow:0 10px 20px rgba(255,111,145,.32);transition:.15s;margin-top:4px}
+  .primary:active{transform:scale(.97)}
+  .err{color:var(--red);font-weight:800;font-size:12.5px;margin-top:8px;min-height:16px}
+  .hintbox{background:#f3f8ff;border:1.5px dashed #cbdcf0;border-radius:12px;padding:9px 11px;font-size:11.5px;font-weight:700;color:var(--ink2);margin-top:14px;line-height:1.5}
+
+  .topbar{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.74);backdrop-filter:blur(10px);border:2px solid #fff;border-radius:24px;padding:9px 14px;box-shadow:var(--shadowSoft)}
+  .miniAv{width:54px;height:54px;flex:0 0 54px;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,#fff,#eef6ff);border:2px solid #fff}
+  .miniAv svg{width:100%;height:100%}
+  .who{flex:1;min-width:0}.who .nm{font-weight:800;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .who .rk{font-size:12px;color:var(--ink2);font-weight:700}
+  .coins{display:flex;align-items:center;gap:6px;background:#fff7e0;border:2px solid #ffe6a8;padding:7px 12px;border-radius:15px;font-weight:800;color:#b7791f;font-size:14px;white-space:nowrap}
+  .coins .c{width:19px;height:19px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe27a,#f0b429);border:1.5px solid #d69e2e}
+  .iconBtn{border:2px solid #fff;background:#fff;border-radius:13px;padding:8px 11px;cursor:pointer;font-weight:800;font-size:13px;box-shadow:var(--shadowSoft);color:var(--ink);transition:.15s}
+  .iconBtn:active{transform:scale(.95)}
+
+  .tabbar{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tab{border:2px solid #fff;background:rgba(255,255,255,.7);border-radius:15px;padding:9px 15px;font-family:var(--f);font-weight:800;font-size:13.5px;cursor:pointer;color:var(--ink2);white-space:nowrap;transition:.15s;box-shadow:var(--shadowSoft)}
+  .tab.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:#fff}
+
+  main{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 4px 18px;margin-top:10px;scrollbar-width:thin}
+  main::-webkit-scrollbar{width:8px}main::-webkit-scrollbar-thumb{background:#c7dcee;border-radius:8px}
+
+  .panel{background:var(--card);border:2px solid #fff;border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
+  .panel h2{font-size:17px;display:flex;align-items:center;gap:9px;margin-bottom:3px}
+  .panel h2 .ic{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:15px}
+  .subtle{color:var(--ink2);font-size:12.5px;font-weight:700;margin-bottom:12px;line-height:1.5}
+  .headRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+  .hero{display:grid;grid-template-columns:290px 1fr;gap:16px;align-items:start}
+  @media(max-width:780px){.hero{grid-template-columns:1fr}}
+  .avatarCard{background:var(--card);border:2px solid #fff;border-radius:var(--r);box-shadow:var(--shadow);padding:16px;text-align:center;position:relative;overflow:hidden}
+  .glowRing{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,207,77,.22),transparent 60%);pointer-events:none}
+  .avStage{width:200px;height:200px;margin:2px auto 2px}
+  .avStage svg,.avBig svg{width:100%;height:100%;overflow:visible;animation:bob 3.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-.6deg)}50%{transform:translateY(-8px) rotate(.6deg)}}
+  .avBig{width:250px;height:250px;margin:0 auto 2px}
+  .rankTitle{font-weight:800;font-size:19px;margin-top:2px}
+  .rankSub{font-size:12px;color:var(--ink2);font-weight:700;margin-top:2px;line-height:1.4}
+  .lvlBadge{display:inline-flex;align-items:center;gap:6px;margin-top:9px;background:linear-gradient(135deg,#fff2cf,#ffe3a1);border:2px solid #ffd97a;color:#b7791f;font-weight:800;padding:6px 14px;border-radius:14px;font-size:13px}
+  .lvlProg{height:15px;background:#e7eef6;border-radius:20px;overflow:hidden;border:1px solid #d6e3f0;margin-top:4px}
+  .lvlProgFill{height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,#ffd36b,#ff9a5b,#ff6f91);transition:width .8s cubic-bezier(.22,1,.36,1)}
+
+  .row{display:flex;align-items:center;gap:12px;background:linear-gradient(170deg,#fbfdff,#f2f8ff);border:2px solid #e6f0fa;border-radius:16px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:.15s}
+  .row:hover{transform:translateX(3px);box-shadow:var(--shadowSoft);border-color:#d3e6f8}
+  .row .rIcon{width:44px;height:44px;flex:0 0 44px;border-radius:13px;display:grid;place-items:center;font-size:22px}
+  .row .rMain{flex:1;min-width:0}
+  .row .rMain .t{font-weight:800;font-size:14.5px}
+  .row .rMain .d{font-size:11.5px;color:var(--ink2);font-weight:700;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .b-wait{background:#fff6e0;color:#b7791f}.b-done{background:#eafbf2;color:var(--greenD)}.b-locked{background:#f0f0f4;color:#8a94a6}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .grid.g2{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .card{position:relative;background:var(--card);border:2px solid #fff;border-radius:18px;box-shadow:var(--shadow);padding:14px;text-align:center;transition:.16s}
+  .card.buy{cursor:pointer}
+  .card.buy:hover{transform:translateY(-4px);box-shadow:0 18px 32px rgba(36,59,83,.16)}
+  .card .em{font-size:40px;margin:4px 0 6px;line-height:1}
+  .card .cn{font-weight:800;font-size:13.5px}
+  .card .cd{font-size:11px;color:var(--ink2);font-weight:700;margin-top:2px;min-height:16px;line-height:1.35}
+  .owned{position:absolute;top:9px;right:9px;background:var(--green);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px}
+  .qty{position:absolute;top:9px;right:9px;background:var(--blue);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px}
+  .equipBtn{margin-top:8px;width:100%;border:none;border-radius:11px;padding:8px;font-family:var(--f);font-weight:800;font-size:12px;cursor:pointer;transition:.15s;color:#fff}
+  .equipBtn:active{transform:scale(.96)}
+  .equipBtn.eq{background:linear-gradient(135deg,#39c07c,#1f9d5f)}
+  .equipBtn.can{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+  .equipBtn.locked{background:#c3ccd8;cursor:not-allowed}
+  .catTitle{font-weight:800;font-size:14px;margin:14px 2px 8px;display:flex;align-items:center;gap:7px}
+
+  /* studio accordion */
+  .accSection{border:2px solid var(--cardline);border-radius:16px;margin-bottom:10px;overflow:hidden}
+  .accHead{display:flex;align-items:center;gap:11px;padding:14px 15px;cursor:pointer;background:linear-gradient(170deg,#fbfdff,#f2f8ff);font-weight:800;font-size:15px;transition:.15s}
+  .accHead:hover{background:#eef6ff}
+  .accHead .ae{font-size:22px}
+  .accHead .cnt{margin-left:auto;font-size:11px;color:var(--ink2);font-weight:800;background:#eef4ff;padding:3px 10px;border-radius:20px}
+  .accHead .chev{font-size:13px;color:var(--ink2);transition:.25s}
+  .accSection.open .chev{transform:rotate(180deg)}
+  .accBody{display:none;padding:12px;background:#fff}
+  .accSection.open .accBody{display:block;animation:pop .25s ease}
+
+  .tHead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .tTitle{font-weight:800;font-size:18px;flex:1}
+  .progDots{display:flex;gap:6px}
+  .pdot{width:11px;height:11px;border-radius:50%;background:#d5e3f0;transition:.3s}
+  .pdot.cur{background:var(--brand);transform:scale(1.35)}.pdot.ok{background:var(--green)}.pdot.bad{background:var(--red)}
+  .callStage{background:var(--card);border:2px solid #fff;border-radius:24px;box-shadow:var(--shadow);padding:20px;position:relative;overflow:hidden}
+  .timerBar{position:absolute;top:0;left:0;height:6px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));border-radius:0 4px 4px 0;transition:width .25s linear}
+  .callRow{display:flex;gap:14px;align-items:flex-end;margin:8px 0 4px}
+  .custAv{width:74px;height:74px;flex:0 0 74px;border-radius:18px;overflow:hidden;box-shadow:var(--shadowSoft);border:2px solid #fff}
+  .custAv svg{width:100%;height:100%}
+  .speech{position:relative;background:linear-gradient(160deg,#fff6ef,#ffeede);border:2px solid #ffd9c2;border-radius:18px 18px 18px 4px;padding:13px 15px;flex:1;font-weight:700;font-size:14.5px;line-height:1.5;color:#7a4a2e;animation:pop .35s cubic-bezier(.22,1.4,.4,1)}
+  @keyframes pop{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:none}}
+  .moodTag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;margin-bottom:5px}
+  .scenario{margin:13px 2px 5px;font-size:12.5px;color:var(--ink2);font-weight:700;line-height:1.5}
+  .qLabel{font-weight:800;font-size:15px;margin:4px 2px 12px}
+  .answers{display:grid;gap:10px}
+  .ans{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:2px solid var(--cardline);border-radius:15px;padding:12px 14px;font-family:var(--f);font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;transition:.16s;line-height:1.4}
+  .ans:hover{border-color:var(--brand);transform:translateX(4px);box-shadow:var(--shadowSoft)}
+  .ans .key{width:28px;height:28px;flex:0 0 28px;border-radius:9px;display:grid;place-items:center;font-weight:800;background:#eef4fb;color:var(--ink2)}
+  .ans.correct{border-color:var(--green);background:#eafbf2}.ans.correct .key{background:var(--green);color:#fff}
+  .ans.wrong{border-color:var(--red);background:#fff0f0}.ans.wrong .key{background:var(--red);color:#fff}
+  .ans.dim{opacity:.5}.ans:disabled{cursor:default}
+  .feedback{margin-top:14px;border-radius:15px;padding:13px 15px;font-weight:700;font-size:13px;line-height:1.5;display:none;animation:pop .3s ease}
+  .feedback.show{display:block}.feedback.good{background:#eafbf2;border:2px solid #b6eccf;color:var(--greenD)}.feedback.bad{background:#fff0f0;border:2px solid #ffc9c9;color:#c53030}
+  .feedback .fT{font-weight:800;font-size:14px;margin-bottom:3px}
+  .nextBtn{margin-top:13px;width:100%;border:none;border-radius:15px;padding:13px;font-family:var(--f);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));cursor:pointer;box-shadow:0 10px 20px rgba(255,111,145,.3);transition:.15s;display:none}
+  .nextBtn.show{display:block;animation:pop .3s ease}.nextBtn:active{transform:scale(.97)}
+
+  /* GAMES */
+  .gameWrap{max-width:640px;margin:0 auto}
+  .qCardBig{background:linear-gradient(135deg,#5b8cff,#9b7bff);color:#fff;border-radius:22px;padding:22px 20px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .qCardBig .qn{font-size:12px;font-weight:800;opacity:.85;letter-spacing:1px}
+  .qCardBig .qt{font-size:19px;font-weight:800;margin-top:6px;line-height:1.35}
+  .gTimer{height:8px;background:rgba(255,255,255,.35);border-radius:20px;overflow:hidden;margin-top:14px}
+  .gTimerFill{height:100%;background:linear-gradient(90deg,#fff,#ffe27a);transition:width .1s linear}
+  .qTiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .qTile{border:none;border-radius:18px;padding:18px 14px;font-family:var(--f);font-weight:800;font-size:15px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:11px;text-align:left;box-shadow:var(--shadow);transition:transform .12s}
+  .qTile:active{transform:scale(.97)}
+  .qTile .sh{font-size:22px}
+  .qTile.t0{background:linear-gradient(135deg,#ff6b6b,#ff8a5b)}
+  .qTile.t1{background:linear-gradient(135deg,#4f9dff,#5b8cff)}
+  .qTile.t2{background:linear-gradient(135deg,#ffb648,#ff8a5b)}
+  .qTile.t3{background:linear-gradient(135deg,#39c07c,#1f9d5f)}
+  .qTile.correct{outline:4px solid #1f9d5f;outline-offset:2px}
+  .qTile.wrong{opacity:.4}
+  .qTile:disabled{cursor:default}
+  .scoreBar{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .scorePill{background:#fff;border:2px solid var(--cardline);border-radius:14px;padding:8px 13px;font-size:13.5px;font-weight:800;box-shadow:var(--shadowSoft)}
+  .scorePill.streak{color:var(--brand)}
+  /* memory */
+  .memGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  @media(max-width:520px){.memGrid{grid-template-columns:repeat(3,1fr)}}
+  .memCard{aspect-ratio:1/1;border-radius:14px;border:2px solid #fff;background:linear-gradient(135deg,#7ec8ff,#5ab0ff);display:grid;place-items:center;cursor:pointer;color:#fff;font-weight:800;font-size:26px;box-shadow:var(--shadowSoft);transition:transform .18s,background .2s;user-select:none;padding:6px;text-align:center}
+  .memCard.flip{background:#fff;color:var(--ink);font-size:11.5px;border-color:var(--brand)}
+  .memCard.matched{background:#eafbf2;color:var(--greenD);border-color:#b6eccf;cursor:default}
+  /* crossword */
+  .cwWrap{overflow-x:auto;padding:2px 0}
+  .cwGrid{display:inline-block;min-width:100%;background:#fdf6e9;border-radius:14px;padding:14px;box-shadow:inset 0 0 0 2px #f0e2c6}
+  .cwRow{display:flex;align-items:center;gap:4px;margin-bottom:4px}
+  .cwNum{width:20px;text-align:center;font-weight:800;color:#b08a55;font-size:12px;flex:0 0 20px}
+  .cwGap{width:30px;height:30px;flex:0 0 30px}
+  .cwCell{width:30px;height:30px;flex:0 0 30px;border:2px solid #cbd8e6;border-radius:6px;text-align:center;font-family:var(--f);font-weight:800;font-size:16px;text-transform:uppercase;color:var(--ink);background:#fff;padding:0}
+  .cwCell:focus{border-color:var(--brand);outline:none}
+  .cwCell.cross{background:#f3e0c1;border-color:#e0c188}
+  .cwCell.ok{background:#eafbf2;border-color:#39c07c;color:var(--greenD)}
+  .cwCell.bad{background:#fff0f0;border-color:#ff6b6b}
+  .cwClue{font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px;line-height:1.4}
+  .cwClue b{color:var(--ink)}
+
+  .adminUser{background:linear-gradient(170deg,#fbfdff,#f2f8ff);border:2px solid #e6f0fa;border-radius:16px;margin-bottom:12px;overflow:hidden}
+  .adminUserHead{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+  .adminUserHead .aAv{width:44px;height:44px;flex:0 0 44px;border-radius:13px;overflow:hidden;background:#eef6ff;border:2px solid #fff}
+  .adminUserHead .aAv svg{width:100%;height:100%}
+  .adminUserBody{padding:0 14px 12px;display:none}
+  .adminUserBody.open{display:block;animation:pop .25s ease}
+  .checkRow{display:flex;align-items:center;gap:11px;background:#fff;border:2px solid var(--cardline);border-radius:13px;padding:10px 12px;margin-bottom:8px}
+  .checkRow .cInfo{flex:1;min-width:0}.checkRow .cInfo .t{font-weight:800;font-size:13.5px}.checkRow .cInfo .d{font-size:11px;color:var(--ink2);font-weight:700}
+  .chk{width:30px;height:30px;flex:0 0 30px;border-radius:9px;border:2px solid #cdd9e6;background:#fff;cursor:pointer;display:grid;place-items:center;font-weight:800;color:#fff;font-size:16px;transition:.15s}
+  .chk.on{background:var(--green);border-color:var(--green)}
+  .miniStat{display:inline-block;background:#eef4ff;color:#3b5bdb;font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px;margin-right:6px}
+  .editRow{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--cardline);border-radius:14px;padding:11px 13px;margin-bottom:9px}
+  .editRow .eInfo{flex:1;min-width:0}.editRow .eInfo .t{font-weight:800;font-size:14px}.editRow .eInfo .d{font-size:11px;color:var(--ink2);font-weight:700;margin-top:1px}
+  .miniBtn{border:none;border-radius:10px;padding:7px 12px;font-family:var(--f);font-weight:800;font-size:12px;cursor:pointer;color:#fff;transition:.15s}
+  .miniBtn:active{transform:scale(.95)}
+  .miniBtn.edit{background:var(--blue)}.miniBtn.del{background:var(--red)}.miniBtn.add{background:linear-gradient(135deg,var(--green),var(--greenD))}
+  .lvlChip{display:inline-block;background:linear-gradient(135deg,#fff2cf,#ffe3a1);color:#b7791f;font-weight:800;font-size:11px;padding:2px 9px;border-radius:20px;margin-right:6px}
+  .logRow{display:flex;align-items:center;gap:11px;background:#fff;border:2px solid var(--cardline);border-radius:13px;padding:10px 13px;margin-bottom:8px}
+  .logRow .lEm{font-size:24px}.logRow .lMain{flex:1;min-width:0}.logRow .lMain .t{font-weight:800;font-size:13.5px}.logRow .lMain .d{font-size:11px;color:var(--ink2);font-weight:700}
+  .logRow .lTime{font-size:11px;color:var(--ink2);font-weight:700;white-space:nowrap}
+  .resDetails{margin-top:8px}.resDetails summary{cursor:pointer;font-weight:800;font-size:12px;color:var(--blue);list-style:none}
+  .resDetails summary::-webkit-details-marker{display:none}
+  .mistake{background:#fff6f6;border:1.5px solid #ffd9d9;border-radius:11px;padding:9px 11px;margin-top:7px;font-size:12px;font-weight:700;line-height:1.5}
+  .mistake .mq{color:var(--ink);font-weight:800;margin-bottom:3px}.mistake .bad{color:#c53030}.mistake .ok{color:var(--greenD)}
+  .pillGreen{background:#eafbf2;color:var(--greenD);font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px}
+  .pillGrey{background:#eef2f7;color:var(--ink2);font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px}
+
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(30,50,72,.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px}
+  .overlay.show{display:flex;animation:fade .3s ease}@keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{background:#fff;border-radius:26px;padding:24px;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.3);animation:modalIn .45s cubic-bezier(.22,1.3,.4,1);position:relative;overflow:hidden;max-height:90vh;overflow-y:auto}
+  @keyframes modalIn{from{opacity:0;transform:scale(.85) translateY(18px)}to{opacity:1;transform:none}}
+  .modal h2{font-size:21px;margin-bottom:6px;text-align:center}
+  .modal p{color:var(--ink2);font-weight:700;font-size:13.5px;line-height:1.55;text-align:center;margin-bottom:12px}
+  .rewardRow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px}
+  .rw{background:#f4f9ff;border:2px solid #e2eefa;border-radius:13px;padding:8px 14px;font-weight:800;font-size:13px;text-align:center}
+  .rw b{font-size:17px;display:block;color:var(--brand)}
+  .modalBtn{margin-top:14px;width:100%;border:none;border-radius:15px;padding:13px;font-family:var(--f);font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));cursor:pointer;box-shadow:0 10px 20px rgba(255,111,145,.3);transition:.15s}
+  .modalBtn:active{transform:scale(.96)}.modalBtn.grey{background:#e6edf5;color:var(--ink)}
+  .detailMeta{background:#f4f9ff;border:2px solid #e2eefa;border-radius:13px;padding:11px 13px;text-align:left;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:10px;line-height:1.6}
+  .detailMeta b{color:var(--ink)}
+  .qEditRow{display:flex;align-items:center;gap:9px;background:#f7fafe;border:1.5px solid #e2eefa;border-radius:12px;padding:9px 11px;margin-bottom:8px}
+  .qEditRow .qi{flex:1;min-width:0;font-size:12.5px;font-weight:700}.qEditRow .qi .t{font-weight:800}
+  .confetti{position:absolute;width:11px;height:16px;top:-20px;opacity:0;border-radius:2px}
+  @keyframes conf{0%{opacity:1;transform:translateY(-10px) rotate(0)}100%{opacity:0;transform:translateY(360px) rotate(540deg)}}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);z-index:60;background:#243b53;color:#fff;font-weight:800;font-size:13.5px;padding:12px 20px;border-radius:15px;box-shadow:var(--shadow);opacity:0;transition:.4s;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .empty{text-align:center;color:var(--ink2);font-weight:700;font-size:13px;padding:20px 10px}
+.simsPanel{background:linear-gradient(160deg,#eaf3ff,#ffffff);overflow:hidden}
+.simsStage{position:relative;height:400px;max-width:520px;margin:0 auto}
+.simsAvatar{position:absolute;left:4px;top:50%;transform:translateY(-50%);width:290px;height:290px;z-index:1}
+.simsAvatar svg{width:100%;height:100%;overflow:visible;animation:bob 3.4s ease-in-out infinite}
+.simsArc{position:absolute;right:0;top:0;width:210px;height:400px;pointer-events:none;z-index:2}
+.simsCat{position:absolute;width:54px;height:54px;border-radius:50%;border:2px solid #fff;background:#fff;box-shadow:var(--shadow);cursor:pointer;font-size:25px;display:grid;place-items:center;pointer-events:auto;transition:transform .15s,box-shadow .15s}
+.simsCat:hover{transform:scale(1.13)}
+.simsCat.sel{background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 8px 22px rgba(255,111,145,.55);transform:scale(1.1)}
+.simsHint{text-align:center;font-weight:800;color:var(--ink2);font-size:13.5px;margin-top:2px}
+.memCard{flex-direction:column;gap:1px}
+@media(max-width:560px){.simsStage{height:360px;max-width:380px}.simsAvatar{width:190px;height:190px;left:-6px}.simsArc{width:190px}.simsCat{width:48px;height:48px;font-size:22px}}
+.simsStage2{position:relative;width:360px;max-width:100%;height:360px;margin:0 auto}
+.simsAvatar2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:212px;height:212px;z-index:1;transition:transform .2s cubic-bezier(.22,1.4,.4,1)}
+.simsAvatar2 svg{width:100%;height:100%;overflow:visible;animation:bob 3.4s ease-in-out infinite}
+.simsStage2 .simsCat{z-index:3}
+#studioItems .panel{animation:pop .28s ease}
+.lockedPanel{background:repeating-linear-gradient(135deg,#f4f6f9,#f4f6f9 14px,#eef1f6 14px,#eef1f6 28px);border-color:#e4e9f0}
+.lockWrap{display:flex;align-items:center;gap:16px}
+.lockBig{font-size:42px;filter:grayscale(.15);opacity:.75}
+.lockTitle{font-weight:800;font-size:16px;color:#8a94a6}
+.lockedCard{background:repeating-linear-gradient(135deg,#f4f6f9,#f4f6f9 12px,#eef1f6 12px,#eef1f6 24px);border-color:#e4e9f0;cursor:not-allowed}
+.lockedCard .cd{color:#8a94a6}
+.roomFrame{border:3px solid #fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);background:#eaf2fb;margin-top:4px}
+.roomFrame svg{width:100%;display:block}
+.rSwatches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.rSwatch{width:34px;height:34px;border-radius:10px;border:3px solid #fff;box-shadow:var(--shadowSoft);cursor:pointer}
+.rSwatch.sel{outline:3px solid var(--brand)}
+@keyframes rSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes rBlink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes rFlicker{0%,100%{opacity:1}50%{opacity:.72}}
+@keyframes rGlow{0%,100%{opacity:.45}50%{opacity:.9}}
+@keyframes rTail{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(12deg)}}
+@keyframes rWiggle{0%,88%,100%{transform:rotate(0)}92%{transform:rotate(-7deg)}96%{transform:rotate(7deg)}}
+@keyframes rCloud{0%{transform:translateX(-8px)}100%{transform:translateX(34px)}}
+@keyframes rSwim{0%{transform:translateX(0)}50%{transform:translateX(18px)}100%{transform:translateX(0)}}
+@keyframes rFloatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.rSway{animation:rSway 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.rBlinkG{animation:rBlink 4s infinite;transform-box:fill-box;transform-origin:50% 50%}
+.rFlick{animation:rFlicker 3s ease-in-out infinite}
+.rGlow{animation:rGlow 3s ease-in-out infinite}
+.rTail{animation:rTail 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:100% 100%}
+.rWig{animation:rWiggle 5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.rCloudA{animation:rCloud 9s ease-in-out infinite alternate}
+.rFish{animation:rSwim 5s ease-in-out infinite}
+.rFloatY{animation:rFloatY 1.4s ease-in-out infinite}
+@keyframes rSteam{0%{opacity:.7;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
+.rSteam{animation:rSteam 2.2s ease-out infinite;transform-box:fill-box}
+@keyframes rFlame{0%,100%{transform:scaleY(1) scaleX(1)}50%{transform:scaleY(1.12) scaleX(.94)}}
+.rFlame{animation:rFlame .5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes rTw{0%,100%{opacity:.3}50%{opacity:1}}
+.rTw{animation:rTw 1.8s ease-in-out infinite}
+@keyframes rSpin{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
+.rSpin{animation:rSpin 6s ease-in-out infinite;transform-box:fill-box}
+</style>
+</head>
+<body>
+<div id="scene">
+  <div class="sun"></div>
+  <div class="cloud" style="top:12%;width:150px;height:46px;animation:drift 44s linear infinite"></div>
+  <div class="cloud" style="top:26%;width:110px;height:34px;animation:drift 60s linear infinite;animation-delay:-20s;opacity:.75"></div>
+  <div class="cloud" style="top:6%;width:190px;height:56px;animation:drift 70s linear infinite;animation-delay:-40s;opacity:.85"></div>
+  <div class="hill h1"></div><div class="hill h2"></div><div class="hill h3"></div>
+</div>
+<div id="app"></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==========================================================================
+   PÉČE MASTER — Akademie operátora (single-file, localStorage). v5
+   ========================================================================== */
+const MAX_TIER=5;
+const RANKS=[
+  {title:"Junior operátor",sub:"Začínáš svou cestu v péči o zákazníka"},
+  {title:"Operátor",sub:"Zvládáš běžné hovory s přehledem"},
+  {title:"Senior operátor",sub:"Řešíš i složité situace v klidu"},
+  {title:"Team Leader",sub:"Vedeš tým a nastavuješ standardy"},
+  {title:"Manažer péče",sub:"Mistr zákaznické zkušenosti ✨"},
+];
+function rankFor(level){return RANKS[Math.min(level,MAX_TIER)-1];}
+const MOOD_KEYS=["klidny","zmateny","natvany","smutny","spokojeny"];
+const MOODS={
+  klidny:{label:"😊 klidný",tagBg:"#eafbf2",tagC:"#1f9d5f",face:"neutral"},
+  zmateny:{label:"😕 zmatený",tagBg:"#fff6e0",tagC:"#b7791f",face:"confused"},
+  natvany:{label:"😠 naštvaný",tagBg:"#fff0f0",tagC:"#c53030",face:"angry"},
+  smutny:{label:"😢 zklamaný",tagBg:"#eef4ff",tagC:"#3b5bdb",face:"sad"},
+  spokojeny:{label:"🤩 nadšený",tagBg:"#f3f0ff",tagC:"#7048e8",face:"happy"},
+};
+const DEFAULT_ELEARNING=[
+  {id:"el_zaklady",title:"Základy komunikace",icon:"👋",color:"#4f9dff",coins:20,level:1,q:[
+    {mood:"klidny",cust:"Dobrý den, volám kvůli své objednávce.",sc:"Zákazník právě zavolal na linku.",q:"Co odpovíš jako první?",a:["Dobrý den, tady Péče Master, ráda/rád vám pomůžu. Jak se jmenujete?","No? Co potřebujete?","Počkejte, hledám objednávku…"],correct:0,good:"Vstřícný pozdrav a představení buduje důvěru.",bad:"Vždy začni pozdravem, představením a nabídkou pomoci."},
+    {mood:"zmateny",cust:"Ehm, já nevím, na koho se mám obrátit…",sc:"Zákazník je nejistý.",q:"Jak ho uklidníš?",a:["To nespadá pod nás.","Nevadí, jste tu správně – společně na to přijdeme. Povězte mi, co se děje.","Musíte být konkrétnější."],correct:1,good:"Ujistil/a jsi ho, že je na správném místě.",bad:"Zmateného zákazníka ujisti a jemně naveď."},
+    {mood:"klidny",cust:"Děkuju za pomoc, mějte se hezky!",sc:"Problém je vyřešen.",q:"Jak hovor ukončíš?",a:["Tak jo, ahoj.","[zavěsíš]","Rádo se stalo! Kdyby cokoli, jsme tu pro vás. Krásný den!"],correct:2,good:"Vřelé zakončení – otevřené dveře pro příště.",bad:"Poděkuj, nabídni další pomoc a rozluč se mile."},
+  ]},
+  {id:"el_stiznosti",title:"Řešení stížností",icon:"🧯",color:"#ff8a5b",coins:30,level:1,q:[
+    {mood:"natvany",cust:"Potřetí mi zásilka nedorazila! To je k vzteku!",sc:"Zákazník je naštvaný.",q:"Jak zareaguješ nejdřív?",a:["Za to my nemůžeme, to dopravce.","Chápu, že vás to štve – omlouvám se a hned to vyřeším.","Uklidněte se, prosím."],correct:1,good:"Uznání emoce + omluva + příslib řešení.",bad:"Nejdřív uznej emoci, neshazuj vinu."},
+    {mood:"natvany",cust:"Chci mluvit s vaším nadřízeným, hned!",sc:"Zákazník žádá eskalaci.",q:"Co uděláš?",a:["Dobře, přepojím a je to váš problém.","Rozumím. Zkusím to nejdřív vyřešit sám/sama – když nebudete spokojen/a, kolegu přepojím.","Nadřízený tu není."],correct:1,good:"Nabídl/a jsi řešení a respektuješ eskalaci.",bad:"Nabídni řešení a respektuj přání eskalovat."},
+    {mood:"smutny",cust:"Spoléhal jsem na ten dárek a teď nepřijde včas…",sc:"Zákazník je zklamaný.",q:"Jaká reakce sedí?",a:["To se stává.","Mrzí mě to, chápu jak je to důležité. Zkusím to zachránit – třeba expres dodáním.","Měl jste objednat dřív."],correct:1,good:"Empatie + konkrétní snaha o řešení.",bad:"Zklamání vyžaduje soucit a proaktivní návrh."},
+  ]},
+  {id:"el_technicka",title:"Technická podpora",icon:"🛠️",color:"#39c07c",coins:30,level:2,q:[
+    {mood:"zmateny",cust:"Aplikace mi pořád padá a nevyznám se v tom.",sc:"Netechnický zákazník.",q:"Jak začneš?",a:["Přeinstalujte to a nashle.","Nevadí, provedu vás krok za krokem. Co přesně vidíte na obrazovce?","To je divné, u nás to funguje."],correct:1,good:"Klidné vedení + zjištění stavu.",bad:"Veď trpělivě, ptej se co vidí, nezahlcuj žargonem."},
+    {mood:"zmateny",cust:"Píšete 'vymažte cache', ale nevím co to je.",sc:"Zákazník nerozumí pojmu.",q:"Jak vysvětlíš?",a:["Cache je mezipaměť v RAM.","To nic – dočasná paměť appky. Otevřete Nastavení a klepněte 'Vymazat data', zvládneme to spolu.","To si vygooglete."],correct:1,good:"Jednoduchý jazyk + konkrétní kroky.",bad:"Vysvětluj lidsky, ne žargonem."},
+    {mood:"natvany",cust:"Zkoušel jsem všechno a nic nefunguje!",sc:"Kroky nezabraly.",q:"Nejlepší další krok?",a:["Tak to nevím.","Díky za trpělivost. Založím prioritní tiket, technici se ozvou do 24 h, potvrzení e-mailem.","Zkuste to celé znovu."],correct:1,good:"Když kroky selžou, eskaluj s jasným příslibem.",bad:"Neopakuj marné kroky – posuň to výš."},
+  ]},
+];
+const SHOP=[
+  {id:"sticker",name:"Samolepky",emoji:"🏷️",cost:8,desc:"Sada firemních samolepek."},
+  {id:"badge",name:"Placka",emoji:"📛",cost:10,desc:"Odznak s logem."},
+  {id:"pen",name:"Propiska",emoji:"🖊️",cost:15,desc:"Kvalitní kuličkovka."},
+  {id:"mug",name:"Hrneček",emoji:"☕",cost:40,desc:"Na ranní kávu se stylem."},
+  {id:"tshirt",name:"Tričko",emoji:"👕",cost:60,desc:"Pohodlné firemní tričko."},
+  {id:"blanket",name:"Deka",emoji:"🧣",cost:80,desc:"Měkká fleecová deka."},
+  {id:"powerbank",name:"Powerbanka",emoji:"🔋",cost:120,desc:"10 000 mAh do kapsy."},
+  {id:"backpack",name:"Batoh",emoji:"🎒",cost:150,desc:"Prostorný batoh do práce."},
+];
+const CUSTOM={
+  skin:{name:"Barva pleti",emoji:"🖐️",items:[
+    {id:"sk_light",name:"Světlá",cost:0,val:"#ffd9b3"},{id:"sk_fair",name:"Bledá",cost:15,val:"#ffe6cf"},
+    {id:"sk_tan",name:"Opálená",cost:15,val:"#e8b487"},{id:"sk_brown",name:"Snědá",cost:15,val:"#c68a5e"},{id:"sk_dark",name:"Tmavá",cost:15,val:"#8d5a3c"},
+  ]},
+  hair:{name:"Účes",emoji:"💇",items:[
+    {id:"hair_short",name:"Krátké",cost:0,val:"short"},{id:"hair_long",name:"Dlouhé",cost:30,val:"long"},
+    {id:"hair_bun",name:"Drdol",cost:40,val:"bun"},{id:"hair_pony",name:"Culík",cost:40,val:"ponytail"},
+    {id:"hair_afro",name:"Afro",cost:60,val:"afro"},{id:"hair_mohawk",name:"Číro",cost:70,val:"mohawk"},{id:"hair_bald",name:"Bez vlasů",cost:15,val:"bald"},
+  ]},
+  hairColor:{name:"Barva vlasů",emoji:"🎨",items:[
+    {id:"hc_brown",name:"Hnědá",cost:0,val:"#6b4327"},{id:"hc_black",name:"Černá",cost:20,val:"#2b2b33"},
+    {id:"hc_blond",name:"Blond",cost:25,val:"#e6b84f"},{id:"hc_red",name:"Zrzavá",cost:25,val:"#c1440e"},
+    {id:"hc_pink",name:"Růžová",cost:55,val:"#ff6f91"},{id:"hc_blue",name:"Modrá",cost:55,val:"#4f9dff"},
+    {id:"hc_green",name:"Zelená",cost:60,val:"#39c07c"},{id:"hc_purple",name:"Fialová",cost:60,val:"#9b7bff"},{id:"hc_silver",name:"Stříbrná",cost:70,val:"#b8c4d0"},
+  ]},
+  beard:{name:"Vousy",emoji:"🧔",items:[
+    {id:"beard_none",name:"Nic",cost:0,val:"none"},{id:"beard_stubble",name:"Strniště",cost:25,val:"stubble"},
+    {id:"beard_mustache",name:"Knír",cost:30,val:"mustache"},{id:"beard_full",name:"Plnovous",cost:45,val:"full"},
+  ]},
+  glasses:{name:"Brýle",emoji:"👓",items:[
+    {id:"gl_none",name:"Nic",cost:0,val:"none"},{id:"gl_round",name:"Brýle",cost:35,val:"round"},
+    {id:"gl_sun",name:"Sluneční",cost:50,val:"sun"},{id:"gl_3d",name:"3D brýle",cost:55,val:"threed"},
+    {id:"gl_heart",name:"Srdíčka",cost:65,val:"heart"},{id:"gl_monocle",name:"Monokl",cost:80,val:"monocle"},
+  ]},
+  hat:{name:"Pokrývka hlavy",emoji:"🎩",items:[
+    {id:"hat_none",name:"Nic",cost:0,val:"none"},{id:"hat_headband",name:"Čelenka",cost:35,val:"headband"},
+    {id:"hat_beanie",name:"Beanie",cost:40,val:"beanie"},{id:"hat_cap",name:"Kšiltovka",cost:45,val:"cap"},
+    {id:"hat_party",name:"Párty čepice",cost:60,val:"party"},{id:"hat_santa",name:"Santa čepice",cost:70,val:"santa"},{id:"hat_top",name:"Cylindr",cost:90,val:"tophat"},
+  ]},
+  accessory:{name:"Doplněk",emoji:"💎",items:[
+    {id:"acc_none",name:"Nic",cost:0,val:"none"},{id:"acc_earring",name:"Náušnice",cost:30,val:"earring"},
+    {id:"acc_flower",name:"Květina",cost:35,val:"flower"},{id:"acc_tie",name:"Kravata",cost:40,val:"tie"},{id:"acc_bow",name:"Motýlek",cost:45,val:"bowtie"},
+  ]},
+  shirt:{name:"Oblečení",emoji:"👕",items:[
+    {id:"sh_default",name:"Firemní",cost:0,val:null},{id:"sh_red",name:"Červené",cost:30,val:"#ff6b6b"},
+    {id:"sh_green",name:"Zelené",cost:30,val:"#39c07c"},{id:"sh_pink",name:"Růžové",cost:30,val:"#ff9ec4"},
+    {id:"sh_purple",name:"Fialové",cost:35,val:"#9b7bff"},{id:"sh_teal",name:"Tyrkysové",cost:35,val:"#22b8cf"},
+    {id:"sh_black",name:"Černé",cost:45,val:"#3a4250"},{id:"sh_gold",name:"Zlaté",cost:80,val:"#ffcf4d"},
+  ]},
+  background:{name:"Pozadí",emoji:"🖼️",items:[
+    {id:"bg_none",name:"Žádné",cost:0,val:null},{id:"bg_sky",name:"Obloha",cost:30,val:["#bfe6ff","#eaf7ff"]},
+    {id:"bg_sunset",name:"Západ",cost:40,val:["#ffd3a5","#ff8a5b"]},{id:"bg_mint",name:"Máta",cost:40,val:["#c8f7dc","#8fe3b0"]},
+    {id:"bg_lav",name:"Levandule",cost:45,val:["#e3d7ff","#b79bff"]},{id:"bg_dark",name:"Noční",cost:60,val:["#3a4a63","#243b53"]},{id:"bg_gold",name:"Zlatá záře",cost:75,val:["#ffe9a8","#ffcf4d"]},
+  ]},
+};
+const STUDIO_ORDER=["shirt","background","hair","hairColor","skin","beard","glasses","hat","accessory"];
+function freeIdOf(cat){return CUSTOM[cat].items[0].id;}
+function defaultEquip(){const e={};Object.keys(CUSTOM).forEach(c=>e[c]=freeIdOf(c));return e;}
+function defaultOwned(){return Object.keys(CUSTOM).map(freeIdOf);}
+
+const DEFAULT_MANDATORY=[
+  {id:"m_bozp",level:1,title:"Úvodní školení BOZP",date:"2026-08-01",coins:30,desc:"Bezpečnost a ochrana zdraví při práci, evakuační plán, ergonomie na pracovišti."},
+  {id:"m_crm",level:1,title:"Systém a přihlášení do CRM",date:"2026-08-03",coins:25,desc:"Orientace v interním systému, zakládání tiketů, vyhledávání zákazníka a zásilky."},
+  {id:"m_komun",level:1,title:"Základy komunikace",date:"2026-08-05",coins:25,desc:"Telefonní etiketa, tón hlasu, aktivní naslouchání a struktura hovoru."},
+  {id:"m_reklam",level:2,title:"Reklamační proces",date:"2026-08-12",coins:35,desc:"Postup při reklamaci zásilky, lhůty, dokumentace a komunikace se zákazníkem."},
+  {id:"m_pickup",level:2,title:"Výdejní místa (Pickup)",date:"2026-08-15",coins:30,desc:"Práce s výdejními místy, přesměrování zásilek, řešení nevyzvednutých balíků."},
+  {id:"m_eskal",level:3,title:"Řešení eskalací",date:"2026-08-22",coins:40,desc:"Deeskalační techniky, předávání na vyšší úroveň, vážné stížnosti."},
+  {id:"m_gdpr",level:3,title:"GDPR a ochrana dat",date:"2026-08-25",coins:35,desc:"Zásady ochrany osobních údajů, ověřování totožnosti, mlčenlivost."},
+  {id:"m_lead",level:4,title:"Vedení směny",date:"2026-09-02",coins:50,desc:"Základy team leadingu, rozdělování práce, podpora kolegů a reporting."},
+];
+
+/* ---------- GAMES data ---------- */
+const GAME_QUIZ=[
+  {q:"Jak nejlépe začít hovor se zákazníkem?",a:["Pozdravem a představením","Otázkou 'co chcete'","Mlčením"],c:0},
+  {q:"Co udělat, když zákazník křičí?",a:["Křičet zpět","Zůstat klidný a uznat emoci","Zavěsit"],c:1},
+  {q:"Co znamená aktivní naslouchání?",a:["Skákat do řeči","Soustředit se a potvrzovat, že rozumím","Dělat si své"],c:1},
+  {q:"Kdy nabídnout eskalaci na nadřízeného?",a:["Nikdy","Když to sám nevyřeším nebo si to zákazník žádá","Hned na začátku"],c:1},
+  {q:"Jak reagovat na oprávněnou stížnost?",a:["Omluvit se a nabídnout řešení","Obhajovat firmu","Ignorovat"],c:0},
+  {q:"Co patří k dobrému ukončení hovoru?",a:["Rychle zavěsit","Poděkovat a nabídnout další pomoc","Nic neříct"],c:1},
+  {q:"Jak působí empatie na zákazníka?",a:["Zhoršuje situaci","Buduje důvěru a klid","Nemá vliv"],c:1},
+  {q:"Jak správně nabídnout vyšší tarif?",a:["Tlačit za každou cenu","Vyjít z potřeb zákazníka","Strašit ho"],c:1},
+  {q:"Co dělat při reklamaci vadného zboží?",a:["Odmítnout ji","Sepsat ji a nabídnout řešení","Poslat ho jinam"],c:1},
+  {q:"Jak reagovat na naštvaného zákazníka?",a:["Bránit se","Nechat ho vymluvit a uznat emoci","Skákat mu do řeči"],c:1},
+];
+const GAME_PAIRS=[
+  {emoji:"📞",term:"Hovor"},{emoji:"💛",term:"Empatie"},
+  {emoji:"📦",term:"Zásilka"},{emoji:"🧯",term:"Stížnost"},
+  {emoji:"🎧",term:"Operátor"},{emoji:"⭐",term:"Spokojenost"},
+  {emoji:"🛠️",term:"Podpora"},{emoji:"🔒",term:"GDPR"},
+];
+const CROSSWORD={
+  secret:"OPERATOR",centralCol:2,coins:35,
+  rows:[
+    {a:"HOVOR",cross:1,clue:"Telefonický rozhovor se zákazníkem"},
+    {a:"EMPATIE",cross:2,clue:"Vcítění se do situace druhého"},
+    {a:"RESENI",cross:1,clue:"Co od nás zákazník čeká u problému (bez háčků)"},
+    {a:"REKLAMACE",cross:0,clue:"Uplatnění vady zboží"},
+    {a:"BALIK",cross:1,clue:"Zásilka, kterou doručujeme"},
+    {a:"TIKET",cross:0,clue:"Záznam požadavku zákazníka v systému"},
+    {a:"OMLUVA",cross:0,clue:"Vhodná reakce na naši chybu"},
+    {a:"KURYR",cross:2,clue:"Člověk, který doručuje zásilky (bez háčků)"},
+  ]
+};
+const GAMES=[
+  {id:"game_cross",name:"Křížovka",emoji:"🧩",desc:"Vylušti pojmy – tajenka ve sloupci."},
+  {id:"game_quiz",name:"Kvíz",emoji:"❓",desc:"Barevná kvízová show, odpovídej rychle."},
+  {id:"game_memory",name:"Pexeso",emoji:"🃏",desc:"Otáčej karty a hledej dvojice."},
+];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ---------- DB ---------- */
+const ROOM_TIERS=[
+ {name:"Startovní kancelář",wall:"#eaf2fb",floor:"#e7d8c3",walls:["#eaf2fb","#ffe9ec","#e9f7ee","#fdf3d8"],floors:["#e7d8c3","#d6b892","#cfe0cf"],nextCost:120,
+  items:[{id:"picture",name:"Obraz",emoji:"🖼️",cost:15},{id:"window",name:"Okno",emoji:"🪟",cost:20},{id:"rug",name:"Koberec",emoji:"🟫",cost:18},{id:"lamp",name:"Lampa",emoji:"💡",cost:20},{id:"cat",name:"Kočka",emoji:"🐱",cost:60},{id:"desk",name:"Stůl",emoji:"🪑",cost:30},{id:"pc",name:"Počítač",emoji:"🖥️",cost:40},{id:"fishbowl",name:"Akvárium",emoji:"🐠",cost:45},{id:"plant",name:"Kytka",emoji:"🪴",cost:25,benefit:"Zalévej – po vykvetení dá mince"},{id:"bin",name:"Koš",emoji:"🗑️",cost:10}]},
+ {name:"Moderní open-space",wall:"#e9f7ee",floor:"#cfd6de",walls:["#e9f7ee","#eef7ff","#f3f0ff","#fff4ea"],floors:["#cfd6de","#d9c4a8","#c7d0da"],nextCost:260,
+  items:[{id:"t2_board",name:"Whiteboard",emoji:"📋",cost:20},{id:"t2_window",name:"Velké okno",emoji:"🪟",cost:30},{id:"t2_rug",name:"Šedý koberec",emoji:"⬜",cost:22},{id:"t2_sofa",name:"Pohovka",emoji:"🛋️",cost:55},{id:"t2_dog",name:"Pes",emoji:"🐶",cost:75},{id:"t2_desk",name:"Bílý stůl",emoji:"🪑",cost:45},{id:"t2_laptop",name:"Notebook",emoji:"💻",cost:45},{id:"t2_coffee",name:"Kávovar",emoji:"☕",cost:40},{id:"t2_monstera",name:"Monstera",emoji:"🌿",cost:35,benefit:"Zalévej – po vykvetení dá mince"},{id:"t2_books",name:"Knihy",emoji:"📚",cost:25}]},
+ {name:"Ředitelské patro",wall:"#2e3b52",floor:"#3a3f4a",walls:["#2e3b52","#33294a","#3a2e2e","#1f3a34"],floors:["#3a3f4a","#463228","#33384a"],nextCost:null,
+  items:[{id:"t3_art",name:"Umění",emoji:"🎨",cost:30},{id:"t3_citywin",name:"Noční panorama",emoji:"🌃",cost:45},{id:"t3_rug",name:"Luxusní koberec",emoji:"🟥",cost:38},{id:"t3_fire",name:"Krb",emoji:"🔥",cost:85},{id:"t3_globe",name:"Globus",emoji:"🌍",cost:60},{id:"t3_desk",name:"Masivní stůl",emoji:"🪑",cost:70},{id:"t3_dualpc",name:"Dva monitory",emoji:"🖥️",cost:80},{id:"t3_trophy",name:"Trofej",emoji:"🏆",cost:55},{id:"t3_bonsai",name:"Bonsaj",emoji:"🌳",cost:45,benefit:"Zalévej – po vykvetení dá mince"},{id:"t3_safe",name:"Trezor",emoji:"🔒",cost:50}]},
+];
+const ROOM_SLOTORDER=["picture","window","t2_board","t2_window","t3_art","t3_citywin","rug","t2_rug","t3_rug","lamp","t2_sofa","t3_fire","cat","t2_dog","t3_globe","desk","t2_desk","t3_desk","pc","t2_laptop","t3_dualpc","fishbowl","t2_coffee","t3_trophy","plant","t2_monstera","t3_bonsai","bin","t2_books","t3_safe"];
+function curTier(u){return ROOM_TIERS[(u.room&&u.room.tier)||0];}
+function roomAllOwned(u){return curTier(u).items.every(it=>u.room.owned[it.id]);}
+const DBKEY="peceMasterDB_v5";
+let DB=loadDB();
+function loadDB(){
+  try{const r=JSON.parse(localStorage.getItem(DBKEY));if(r&&r.users){migrate(r);return r;}}catch(e){}
+  const fresh={users:{},mandatory:JSON.parse(JSON.stringify(DEFAULT_MANDATORY)),elearning:JSON.parse(JSON.stringify(DEFAULT_ELEARNING)),activity:[],results:[],session:null,sound:true};
+  fresh.users["admin"]={pass:"admin",role:"admin",display:"Administrátor",created:Date.now()};
+  fresh.users["operator"]=newUser("operator","operator","Nový operátor");
+  return fresh;
+}
+function migrate(db){
+  db.mandatory=db.mandatory||JSON.parse(JSON.stringify(DEFAULT_MANDATORY));
+  db.elearning=db.elearning||JSON.parse(JSON.stringify(DEFAULT_ELEARNING));
+  db.activity=db.activity||[];db.results=db.results||[];db.elearning.forEach(el=>{if(!el.level)el.level=({el_zaklady:1,el_stiznosti:1,el_technicka:2})[el.id]||1;});
+  Object.values(db.users).forEach(u=>{if(u.role!=='admin')normalizeUser(u);});
+}
+function saveDB(){try{localStorage.setItem(DBKEY,JSON.stringify(DB));}catch(e){}}
+function newUser(username,pass,display){
+  return {pass,role:"user",display:display||username,created:Date.now(),coins:0,mandatory:{},awarded:{},elearning:{},inventory:{},games:{},notifications:[],room:{tier:0,owned:{},shown:{},wall:"#eaf2fb",floor:"#e7d8c3",plant:{stage:0,last:0}},ownedCustom:defaultOwned(),equip:defaultEquip()};
+}
+function normalizeUser(u){
+  u.coins=u.coins||0;u.mandatory=u.mandatory||{};u.awarded=u.awarded||{};u.elearning=u.elearning||{};u.inventory=u.inventory||{};u.games=u.games||{};u.notifications=u.notifications||[];u.room=u.room||{tier:0,owned:{},shown:{},wall:"#eaf2fb",floor:"#e7d8c3",plant:{stage:0,last:0}};u.room.owned=u.room.owned||{};u.room.shown=u.room.shown||{};u.room.plant=u.room.plant||{stage:0,last:0};u.room.tier=u.room.tier||0;u.ownedCustom=u.ownedCustom||[];u.equip=u.equip||{};
+  Object.keys(CUSTOM).forEach(cat=>{const free=freeIdOf(cat);if(!u.ownedCustom.includes(free))u.ownedCustom.push(free);if(!u.equip[cat]||!CUSTOM[cat].items.find(x=>x.id===u.equip[cat]))u.equip[cat]=free;});
+}
+function me(){return DB.session?DB.users[DB.session]:null;}
+function mandatoryForLevel(L){return DB.mandatory.filter(t=>t.level===L);}
+function highestDefinedLevel(){return DB.mandatory.reduce((m,t)=>Math.max(m,t.level),1);}
+function userLevel(u){let lvl=1;const maxL=highestDefinedLevel();for(let L=1;L<=maxL;L++){const req=mandatoryForLevel(L);if(req.length>0&&req.every(t=>u.mandatory[t.id]==='completed'))lvl=L+1;else break;}return lvl;}
+function levelProgress(u){const L=userLevel(u),req=mandatoryForLevel(L);const done=req.filter(t=>u.mandatory[t.id]==='completed').length;return {L,done,total:req.length,req};}
+
+/* ---------- AUDIO ---------- */
+let AC=null;
+function beep(f,d,t,v){if(!DB.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  const o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(v||.07,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+(d||.15));
+  o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+(d||.15));}catch(e){}}
+const sfx={click:()=>beep(520,.06,'triangle',.05),good:()=>{beep(660,.1,'sine',.09);setTimeout(()=>beep(880,.14,'sine',.09),90);},
+  bad:()=>beep(180,.22,'sawtooth',.05),coin:()=>{beep(880,.06,'square',.05);setTimeout(()=>beep(1320,.08,'square',.05),60);},
+  level:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.08),i*110));}};
+
+/* ---------- AVATAR ---------- */
+function valOf(cat,id){const it=CUSTOM[cat].items.find(x=>x.id===id);return it?it.val:CUSTOM[cat].items[0].val;}
+function avatarConfig(u){
+  const lvl=userLevel(u),tier=Math.min(lvl,MAX_TIER);const shirtCustom=valOf('shirt',u.equip.shirt);
+  return {tier,skin:valOf('skin',u.equip.skin),hair:valOf('hair',u.equip.hair),hairColor:valOf('hairColor',u.equip.hairColor),
+    shirt:shirtCustom||["#7ec8ff","#5ab0ff","#ff9a5b","#9b7bff","#ffcf4d"][tier-1],
+    hat:valOf('hat',u.equip.hat),glasses:valOf('glasses',u.equip.glasses),beard:valOf('beard',u.equip.beard),
+    accessory:valOf('accessory',u.equip.accessory),background:valOf('background',u.equip.background)};
+}
+function shade(hex,pct){if(!hex||hex[0]!=='#')return hex;let n=parseInt(hex.slice(1),16);
+  let r=(n>>16)&255,g=(n>>8)&255,b=n&255;const f=Math.abs(pct)/100;
+  r=Math.round(r+(pct>0?(255-r):-r)*f);g=Math.round(g+(pct>0?(255-g):-g)*f);b=Math.round(b+(pct>0?(255-b):-b)*f);
+  r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+  return"#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function operatorSVG(cfg){
+  const uid=(operatorSVG._n=(operatorSVG._n||0)+1);
+  const tier=cfg.tier,shirt=cfg.shirt,shirtD=shade(shirt,-18);
+  const skin=cfg.skin||"#ffd9b3",skinE=shade(skin,-6),skinN=shade(skin,-16);
+  const headset=["#5a6b7d","#455a70","#2f6d52","#5b3fa0","#b7791f"][tier-1];
+  const auraOn=tier>=3,star=tier>=4,crown=tier>=5&&cfg.hat==="none";
+  const glow=["#7ec8ff","#5ab0ff","#39c07c","#9b7bff","#ffcf4d"][tier-1];
+  const hc=cfg.hairColor,bc=shade(hc,-8);
+  let bg="";if(cfg.background)bg=`<defs><linearGradient id="bg${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cfg.background[0]}"/><stop offset="1" stop-color="${cfg.background[1]}"/></linearGradient></defs><rect x="-6" y="-6" width="212" height="222" rx="28" fill="url(#bg${uid})"/>`;
+  let aura=auraOn?`<circle cx="100" cy="108" r="86" fill="none" stroke="${glow}" stroke-width="4" opacity=".3"><animate attributeName="r" values="82;90;82" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".12;.35;.12" dur="3s" repeatCount="indefinite"/></circle>`:"";
+  let hairBack="";
+  if(cfg.hair==="long")hairBack=`<path d="M50 96 q-8 44 6 70 l16 0 q-10 -34 -4 -66z" fill="${hc}"/><path d="M150 96 q8 44 -6 70 l-16 0 q10 -34 4 -66z" fill="${hc}"/>`;
+  if(cfg.hair==="ponytail")hairBack=`<path d="M150 92 q26 6 26 40 q0 26 -14 40 q10 -30 -2 -52 q-8 -14 -18 -18z" fill="${hc}"/>`;
+  if(cfg.hair==="afro")hairBack=`<circle cx="100" cy="72" r="46" fill="${hc}"/><circle cx="58" cy="98" r="22" fill="${hc}"/><circle cx="142" cy="98" r="22" fill="${hc}"/>`;
+  let hairTop="";
+  if(cfg.hair==="bald")hairTop=`<path d="M62 84 q38 -20 76 0 q-6 -4 -12 -6 q-26 -10 -52 0 q-6 2 -12 6z" fill="${shade(hc,20)}" opacity=".45"/>`;
+  else if(cfg.hair==="mohawk")hairTop=`<path d="M90 96 q-6 -54 10 -58 q16 4 10 58z" fill="${hc}"/>`;
+  else if(cfg.hair==="afro")hairTop=`<path d="M60 92 q40 -22 80 0 q-40 -12 -80 0z" fill="${hc}"/>`;
+  else{hairTop=`<path d="M56 100 q0 -46 44 -46 q44 0 44 46 q-14 -20 -44 -20 q-30 0 -44 20z" fill="${hc}"/>`;
+    if(cfg.hair==="bun")hairTop+=`<circle cx="100" cy="46" r="15" fill="${hc}"/>`;
+    if(cfg.hair==="short")hairTop+=`<path d="M60 92 q6 -14 22 -16 q-6 8 -6 16z" fill="${shade(hc,14)}"/>`;}
+  let glasses="";
+  if(cfg.glasses==="round")glasses=`<g stroke="#3a4250" stroke-width="3" fill="none"><circle cx="84" cy="100" r="11"/><circle cx="116" cy="100" r="11"/><path d="M95 100 h10"/><path d="M73 98 l-9 -3"/><path d="M127 98 l9 -3"/></g>`;
+  if(cfg.glasses==="sun")glasses=`<g><rect x="72" y="92" width="24" height="16" rx="7" fill="#2b2b33"/><rect x="104" y="92" width="24" height="16" rx="7" fill="#2b2b33"/><path d="M96 98 h8" stroke="#2b2b33" stroke-width="3"/><path d="M72 96 l-8 -3" stroke="#2b2b33" stroke-width="3"/><path d="M128 96 l8 -3" stroke="#2b2b33" stroke-width="3"/></g>`;
+  if(cfg.glasses==="threed")glasses=`<g><rect x="70" y="93" width="26" height="15" rx="4" fill="#ff5252" opacity=".72"/><rect x="104" y="93" width="26" height="15" rx="4" fill="#4f9dff" opacity=".72"/><path d="M96 100 h8" stroke="#333" stroke-width="3"/></g>`;
+  if(cfg.glasses==="heart")glasses=`<g fill="#ff6f91"><path d="M84 96 c-3 -4 -9 -2 -9 3 c0 4 5 7 9 10 c4 -3 9 -6 9 -10 c0 -5 -6 -7 -9 -3z"/><path d="M116 96 c-3 -4 -9 -2 -9 3 c0 4 5 7 9 10 c4 -3 9 -6 9 -10 c0 -5 -6 -7 -9 -3z"/></g>`;
+  if(cfg.glasses==="monocle")glasses=`<g stroke="#b7791f" stroke-width="2.6" fill="rgba(255,255,255,.25)"><circle cx="116" cy="100" r="12"/></g><path d="M116 112 q-1 12 -8 20" stroke="#b7791f" stroke-width="2" fill="none"/>`;
+  let hat="";
+  if(cfg.hat==="cap")hat=`<g><path d="M56 74 q44 -30 88 0 l0 6 q-44 -14 -88 0z" fill="#c0392b"/><path d="M56 78 q44 -12 88 0 q6 2 6 10 l-100 0 q0 -8 6 -10z" fill="#e74c3c"/><path d="M138 84 q22 2 30 12 l-30 2z" fill="#b93222"/><circle cx="100" cy="70" r="4" fill="#fff"/></g>`;
+  if(cfg.hat==="beanie")hat=`<g><path d="M54 88 q0 -40 46 -40 q46 0 46 40 z" fill="#3f7cc9"/><rect x="52" y="82" width="96" height="12" rx="6" fill="#2f5f9e"/><circle cx="100" cy="46" r="7" fill="#5b9bd5"/></g>`;
+  if(cfg.hat==="party")hat=`<g><path d="M100 24 l18 44 l-36 0z" fill="#ff6f91"/><path d="M100 24 l18 44 l-9 0 z" fill="#ff8fab"/><circle cx="100" cy="22" r="6" fill="#ffcf4d"/><circle cx="90" cy="52" r="3" fill="#fff"/><circle cx="108" cy="44" r="3" fill="#ffe27a"/></g>`;
+  if(cfg.hat==="headband")hat=`<g><rect x="54" y="78" width="92" height="12" rx="6" fill="#ff6f91"/><path d="M66 84 l-8 -6 4 10z" fill="#e14b6e"/><circle cx="70" cy="84" r="5" fill="#ffcf4d"/></g>`;
+  if(cfg.hat==="santa")hat=`<g><path d="M56 82 q40 -60 86 -8 l-8 8 q-38 -22 -70 4z" fill="#e74c3c"/><rect x="50" y="78" width="98" height="13" rx="6" fill="#fff"/><circle cx="140" cy="30" r="9" fill="#fff"/></g>`;
+  if(cfg.hat==="tophat")hat=`<g><rect x="62" y="42" width="76" height="9" rx="4" fill="#2b2b33"/><rect x="74" y="4" width="52" height="42" rx="5" fill="#2b2b33"/><rect x="74" y="30" width="52" height="8" fill="#c0392b"/></g>`;
+  let beard="";
+  if(cfg.beard==="stubble")beard=`<path d="M68 116 q32 30 64 0 q-6 20 -32 22 q-26 -2 -32 -22z" fill="${bc}" opacity=".22"/>`;
+  if(cfg.beard==="mustache")beard=`<path d="M86 115 q14 7 28 0 q-5 8 -14 8 q-9 0 -14 -8z" fill="${bc}"/>`;
+  if(cfg.beard==="full")beard=`<path d="M62 106 q6 44 38 46 q32 -2 38 -46 q-10 30 -38 30 q-28 0 -38 -30z" fill="${bc}"/>`;
+  let acc="";
+  if(cfg.accessory==="earring")acc=`<circle cx="144" cy="121" r="3.4" fill="#ffcf4d" stroke="#e0a92e" stroke-width="1"/><circle cx="56" cy="121" r="3.4" fill="#ffcf4d" stroke="#e0a92e" stroke-width="1"/>`;
+  if(cfg.accessory==="tie")acc=`<path d="M94 156 l6 -5 6 5 -6 6z" fill="#a93226"/><path d="M100 162 l-6 6 6 22 6 -22z" fill="#c0392b"/>`;
+  if(cfg.accessory==="bowtie")acc=`<g><path d="M100 161 l-13 -6 0 13z" fill="#9b7bff"/><path d="M100 161 l13 -6 0 13z" fill="#9b7bff"/><rect x="97" y="158" width="6" height="7" rx="2" fill="#7f5ee0"/></g>`;
+  if(cfg.accessory==="flower")acc=`<g transform="translate(78 152)"><circle cx="-5" r="3.2" fill="#ff6f91"/><circle cx="5" r="3.2" fill="#ff6f91"/><circle cy="-5" r="3.2" fill="#ff6f91"/><circle cy="5" r="3.2" fill="#ff6f91"/><circle r="3" fill="#ffcf4d"/></g>`;
+  let crownEl=crown?`<g transform="translate(100 30)"><path d="M-24 6 L-24 -10 L-12 2 L0 -16 L12 2 L24 -10 L24 6 Z" fill="#ffcf4d" stroke="#e0a92e" stroke-width="2"/><circle cx="-24" cy="-10" r="3.2" fill="#ff6f91"/><circle cx="0" cy="-16" r="3.2" fill="#4f9dff"/><circle cx="24" cy="-10" r="3.2" fill="#39c07c"/></g>`:"";
+  let stars=star?`<path class="tw" d="M158 52 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#ffcf4d"/>`:"";
+  return `<svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="ck${uid}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffb3b3"/><stop offset="100%" stop-color="#ffb3b3" stop-opacity="0"/></radialGradient></defs>
+    ${bg}${aura}${hairBack}
+    <path d="M46 210 q0 -58 54 -58 q54 0 54 58 Z" fill="${shirt}"/>
+    <path d="M46 210 q0 -58 54 -58 q6 0 11 1 l0 57 Z" fill="${shirtD}" opacity=".35"/>
+    <path d="M100 152 l-15 12 8 12 7 -8 7 8 8 -12 z" fill="#ffffff"/>
+    <circle cx="100" cy="176" r="5" fill="${shirtD}"/>
+    <rect x="90" y="132" width="20" height="26" rx="9" fill="${skinN}"/>
+    <circle cx="100" cy="104" r="46" fill="${skin}"/>
+    ${hairTop}
+    <circle cx="56" cy="108" r="9" fill="${skinE}"/><circle cx="144" cy="108" r="9" fill="${skinE}"/>
+    <circle cx="76" cy="116" r="10" fill="url(#ck${uid})"/><circle cx="124" cy="116" r="10" fill="url(#ck${uid})"/>
+    <g class="eyes"><ellipse cx="84" cy="100" rx="7" ry="8.5" fill="#fff"/><ellipse cx="116" cy="100" rx="7" ry="8.5" fill="#fff"/>
+      <circle class="pupil" cx="85" cy="102" r="4.2" fill="#2b2b2b"/><circle class="pupil" cx="117" cy="102" r="4.2" fill="#2b2b2b"/>
+      <circle cx="86.5" cy="100" r="1.4" fill="#fff"/><circle cx="118.5" cy="100" r="1.4" fill="#fff"/></g>
+    <path d="M76 88 q8 -4 16 0" stroke="${shade(hc,-10)}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M108 88 q8 -4 16 0" stroke="${shade(hc,-10)}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${glasses}${beard}
+    <path d="M86 122 q14 14 28 0" stroke="#c1553b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M54 104 a46 40 0 0 1 92 0" fill="none" stroke="${headset}" stroke-width="7" stroke-linecap="round"/>
+    <rect x="46" y="100" width="14" height="24" rx="7" fill="${headset}"/><rect x="140" y="100" width="14" height="24" rx="7" fill="${headset}"/>
+    <path d="M53 122 q-10 12 6 22 q10 6 18 2" fill="none" stroke="${headset}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="80" cy="146" r="6" fill="${shirtD}"/>
+    ${acc}${stars}${hat}${crownEl}
+    <style>.pupil{animation:look 5s ease-in-out infinite}@keyframes look{0%,40%{transform:translateX(0)}50%,70%{transform:translateX(3px)}80%,100%{transform:translateX(0)}}
+    .eyes{transform-origin:center;animation:blink 4.2s infinite}@keyframes blink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+    .tw{animation:tw 1.6s ease-in-out infinite}@keyframes tw{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}</style>
+  </svg>`;
+}
+function customerSVG(face){
+  const skin="#ffe0c2";let mouth,brows,extra="";
+  if(face==="angry"){mouth=`<path d="M40 62 q10 -8 20 0" stroke="#b23" stroke-width="4" fill="none" stroke-linecap="round"/>`;brows=`<path d="M28 36 l16 6" stroke="#5b3a29" stroke-width="4" stroke-linecap="round"/><path d="M72 36 l-16 6" stroke="#5b3a29" stroke-width="4" stroke-linecap="round"/>`;extra=`<path d="M64 20 l6 -6 M70 22 l8 -3" stroke="#ff6b6b" stroke-width="3" stroke-linecap="round"/>`;}
+  else if(face==="sad"){mouth=`<path d="M40 60 q10 8 20 0" stroke="#5b6b8a" stroke-width="4" fill="none" stroke-linecap="round"/>`;brows=`<path d="M30 34 q8 4 14 0" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M56 34 q8 4 14 0" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;extra=`<circle cx="34" cy="52" r="3" fill="#7cc5ff"><animate attributeName="cy" values="50;60" dur="2s" repeatCount="indefinite"/></circle>`;}
+  else if(face==="confused"){mouth=`<path d="M40 60 q10 4 20 -2" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/>`;brows=`<path d="M28 34 q8 -4 14 0" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M58 30 q6 0 12 4" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;extra=`<text x="70" y="22" font-size="18" fill="#b7791f" font-weight="800">?</text>`;}
+  else if(face==="happy"){mouth=`<path d="M38 56 q12 14 24 0" stroke="#c1553b" stroke-width="4" fill="#fff" stroke-linecap="round"/>`;brows=`<path d="M28 34 q8 -3 14 0" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M56 34 q8 -3 14 0" stroke="#5b3a29" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;extra=`<path d="M66 18 l3 6 6 1 -5 4 1 6 -5 -3 -5 3 1 -6 -5 -4 6 -1z" fill="#ffcf4d"/>`;}
+  else{mouth=`<path d="M40 58 h20" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/>`;brows=`<path d="M28 34 h14" stroke="#5b3a29" stroke-width="3.5" stroke-linecap="round"/><path d="M56 34 h14" stroke="#5b3a29" stroke-width="3.5" stroke-linecap="round"/>`;}
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#f0f7ff"/><circle cx="50" cy="54" r="34" fill="${skin}"/><path d="M50 20 a34 34 0 0 1 30 26 q-30 -12 -60 0 a34 34 0 0 1 30 -26z" fill="#7a5230"/><circle cx="36" cy="44" r="6" fill="#fff"/><circle cx="64" cy="44" r="6" fill="#fff"/><circle cx="37" cy="45" r="3" fill="#2b2b2b"><animate attributeName="cx" values="37;39;37" dur="4s" repeatCount="indefinite"/></circle><circle cx="65" cy="45" r="3" fill="#2b2b2b"><animate attributeName="cx" values="65;67;65" dur="4s" repeatCount="indefinite"/></circle>${brows}${mouth}${extra}</svg>`;
+}
+
+/* ---------- ROUTER ---------- */
+const app=document.getElementById("app");
+let state={tab:"profil",adminTab:"users",adminOpenUser:null,studioOpen:"shirt"};
+function render(){const u=me();if(!u){renderLogin();return;}if(u.role==="admin")renderAdmin();else renderUser();}
+
+/* ---------- LOGIN ---------- */
+function renderLogin(){
+  const demoCfg={tier:2,skin:"#ffd9b3",hair:"short",hairColor:"#6b4327",shirt:"#5ab0ff",hat:"none",glasses:"none",beard:"none",accessory:"none",background:["#bfe6ff","#eaf7ff"]};
+  app.innerHTML=`<div class="loginWrap"><div class="loginCard screen">
+    <div class="lAv">${operatorSVG(demoCfg)}</div><div class="logo"><span class="p">Péče</span> Master</div><div class="logoSub">Akademie operátora zákaznické péče</div>
+    <div class="field"><label>Uživatelské jméno</label><input id="fUser" autocomplete="off" placeholder="jméno"></div>
+    <div class="field"><label>Heslo</label><input id="fPass" type="password" placeholder="heslo"></div>
+    <div class="err" id="loginErr"></div><button class="primary" id="loginBtn">Přihlásit se</button>
+    <div class="hintbox">🔑 Účty zakládá administrátor. Demo — <b>admin</b> / admin &nbsp;·&nbsp; <b>operator</b> / operator.</div></div></div>`;
+  document.getElementById("loginBtn").onclick=doLogin;
+  ["fUser","fPass"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();}));
+}
+function doLogin(){const err=document.getElementById("loginErr");
+  const uname=(document.getElementById("fUser").value||"").trim().toLowerCase();const pass=document.getElementById("fPass").value||"";
+  if(!uname||!pass){err.textContent="Vyplň jméno i heslo.";return;}
+  const usr=DB.users[uname];if(!usr||usr.pass!==pass){err.textContent="Nesprávné jméno nebo heslo.";sfx.bad();return;}
+  DB.session=uname;saveDB();sfx.click();state.tab="profil";state.adminTab="users";render();}
+function logout(){sfx.click();DB.session=null;saveDB();renderLogin();}
+
+/* ---------- CHROME ---------- */
+function topbar(u){const coinBox=u.role==="user"?`<div class="coins"><span class="c"></span><span id="coinCount">${u.coins}</span></div>`:'';
+  return `<div class="topbar"><div class="miniAv" id="miniAvBox">${u.role==='admin'?adminBadgeSVG():operatorSVG(avatarConfig(u))}</div>
+    <div class="who"><div class="nm">${esc(u.display)}</div><div class="rk">${u.role==='admin'?'Administrátor · správa akademie':'Level '+userLevel(u)+' · '+rankFor(userLevel(u)).title}</div></div>
+    ${coinBox}<button class="iconBtn" id="soundBtn">${DB.sound?'🔊':'🔇'}</button><button class="iconBtn" id="logoutBtn">Odhlásit</button></div>`;}
+function adminBadgeSVG(){return `<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#eef2ff"/><circle cx="50" cy="50" r="30" fill="#5b6b8a"/><path d="M50 34 l4 10 11 1 -8 7 2 11 -9 -6 -9 6 2 -11 -8 -7 11 -1z" fill="#ffcf4d"/></svg>`;}
+function wireChrome(){document.getElementById("soundBtn").onclick=()=>{DB.sound=!DB.sound;saveDB();if(DB.sound)sfx.click();render();};document.getElementById("logoutBtn").onclick=logout;}
+
+/* ---------- USER APP ---------- */
+function renderUser(){
+  const u=me();
+  const tabs=[["profil","🏠 Profil"],["povinna","📋 Školení"],["elearning","🎓 E-learning"],["hry","🎮 Hry"],["studio","🎨 Studio"],["eshop","🛍️ E-shop"]];
+  app.innerHTML=`${topbar(u)}<div class="tabbar">${tabs.map(t=>`<button class="tab ${state.tab===t[0]?'on':''}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div><main id="main"></main>`;
+  wireChrome();
+  document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{sfx.click();state.tab=b.dataset.tab;renderUser();});
+  const m=document.getElementById("main");
+  if(state.tab==="profil")m.innerHTML=viewProfile(u);
+  else if(state.tab==="povinna")m.innerHTML=viewMandatory(u);
+  else if(state.tab==="elearning")m.innerHTML=viewElearning(u);
+  else if(state.tab==="hry")renderGames(m,u);
+  else if(state.tab==="studio")renderStudio(m,u);
+  else if(state.tab==="eshop")renderEshop(m,u);
+  wireUserView(u);checkNotifications();
+}
+function viewProfile(u){
+  const cfg=avatarConfig(u),L=userLevel(u),r=rankFor(L),p=levelProgress(u);
+  const pct=p.total?Math.round(p.done/p.total*100):100;const nextR=L<MAX_TIER?rankFor(L+1).title:"MAX 👑";
+  const invCount=Object.values(u.inventory).reduce((a,b)=>a+b,0);
+  return `<div class="screen"><div class="hero">
+    <div class="avatarCard"><div class="glowRing"></div><div class="avStage">${operatorSVG(cfg)}</div>
+      <div class="rankTitle">${r.title}</div><div class="rankSub">${r.sub}</div><div class="lvlBadge">⭐ Level ${L}</div></div>
+    <div>
+      <div class="panel"><h2><span class="ic" style="background:#ff8a5b22">🚀</span> Postup na Level ${L<MAX_TIER?L+1:L}</h2>
+        <div class="subtle">${p.total?`Splň všechna povinná školení této úrovně (schvaluje administrátor). Hotovo ${p.done} z ${p.total}.`:`Pro tuto úroveň zatím nejsou definována povinná školení.`}</div>
+        <div class="lvlProg"><div class="lvlProgFill" style="width:${pct}%"></div></div><div class="subtle" style="margin:6px 0 0">Další meta: <b>${nextR}</b></div></div>
+      <div class="panel"><h2><span class="ic" style="background:#4f9dff22">📊</span> Přehled</h2>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px"><div class="rw" style="flex:1"><b>${u.coins}</b>🪙 mincí</div><div class="rw" style="flex:1"><b>${Object.keys(u.elearning).length}</b>🎓 e-learningů</div><div class="rw" style="flex:1"><b>${invCount}</b>🎁 předmětů</div></div></div>
+      <div class="panel"><h2><span class="ic" style="background:#9b7bff22">⚙️</span> Účet</h2>
+        <div class="subtle">Uživatelské jméno: <b>${esc(DB.session)}</b></div>
+        <button class="iconBtn" id="pwBtn" style="width:100%;padding:11px;border-color:#e2d7ff;background:#f6f2ff;color:#7048e8">🔑 Změnit heslo</button></div>
+      <div class="panel" style="margin-bottom:0"><h2><span class="ic" style="background:#39c07c22">🪴</span> Moje kancelář <span class="lvlChip" style="margin-left:6px" id="roomTier">${curTier(u).name}</span></h2>
+        <div class="subtle">Zařiď si vlastní kancelář! Kup nábytek a doplňky – každý ožívá vlastní animací. Kytku můžeš zalévat a když vykvete, dá ti mince.</div>
+        <div class="roomFrame"><div id="roomStage">${roomSVG(u)}</div></div>
+        <div class="subtle" id="roomCap" style="text-align:center;margin:8px 0 0">${roomCaption(u)}</div>
+        <button class="modalBtn" id="roomShopBtn" style="margin-top:10px">🛒 Obchod kanceláře</button></div>
+    </div></div></div>`;
+}
+function viewMandatory(u){
+  const maxL=Math.max(highestDefinedLevel(),userLevel(u));let html=`<div class="screen">`;
+  for(let L=1;L<=maxL;L++){const req=mandatoryForLevel(L);if(!req.length)continue;
+    const locked=L>userLevel(u),allDone=req.every(t=>u.mandatory[t.id]==='completed');
+    if(locked){
+      html+=`<div class="panel lockedPanel"><div class="lockWrap"><div class="lockBig">🔒</div>
+        <div style="flex:1"><div class="lockTitle">Úroveň ${L} · zamčeno</div>
+        <div class="subtle" style="margin:3px 0 0">Nejdřív dokonči úroveň ${L-1}. Školení této úrovně se odhalí až po odemčení.</div></div>
+        <span class="badge b-locked">🔒 ${req.length}</span></div></div>`;
+      continue;}
+    html+=`<div class="panel"><h2><span class="ic" style="background:${allDone?'#39c07c22':'#ffcf4d22'}">${allDone?'✅':'📋'}</span>Level ${L} → ${L+1} <span class="lvlChip" style="margin-left:6px">${req.length} školení</span></h2>
+      <div class="subtle">Splnění potvrzuje administrátor. Po schválení získáš mince.</div>`;
+    req.forEach(t=>{const done=u.mandatory[t.id]==='completed';const badge=done?'<span class="badge b-done">✓ splněno</span>':'<span class="badge b-wait">⏳ čeká na schválení</span>';
+      html+=`<div class="row" data-mand="${t.id}"><div class="rIcon" style="background:${done?'#eafbf2':'#eef4ff'}">${done?'✅':'📘'}</div><div class="rMain"><div class="t">${esc(t.title)}</div><div class="d">📅 ${fmtDate(t.date)} · +${t.coins} 🪙</div></div>${badge}</div>`;});
+    html+=`</div>`;}
+  html+=`</div>`;return html;
+}
+function viewElearning(u){
+  const L=userLevel(u);
+  const list=DB.elearning.slice().sort((a,b)=>(a.level||1)-(b.level||1));
+  const cards=list.map(el=>{const lvl=el.level||1;const locked=lvl>L;
+    if(locked)return `<div class="card lockedCard"><div class="lockBig" style="font-size:34px;margin:2px 0 4px">🔒</div><div class="cn" style="color:#8a94a6">Level ${lvl}</div><div class="cd">Odemkne se na úrovni ${lvl}</div></div>`;
+    const done=!!u.elearning[el.id];
+    return `<div class="card buy" data-el="${el.id}">${done?'<div class="owned">✓ hotovo</div>':''}<div class="em">${el.icon||'🎓'}</div><div class="cn">${esc(el.title)}</div><div class="cd">${(el.q||[]).length} scénářů · Lvl ${lvl}</div><div class="rw" style="margin-top:8px;display:inline-block">${done?'zopakovat':'+'+el.coins+' 🪙'}</div></div>`;
+  }).join("")||'<div class="empty">Zatím žádná e-learningová školení.</div>';
+  return `<div class="screen"><div class="panel"><h2><span class="ic" style="background:#9b7bff22">🎓</span> E-learning</h2>
+    <div class="subtle">Interaktivní školení, která splníš sám. S vyšší úrovní se odemykají další. Za dokončení získáš mince, výsledky vidí administrátor.</div>
+    <div class="grid g2">${cards}</div></div></div>`;
+}
+function renderEshop(m,u){
+  m.innerHTML=`<div class="screen"><div class="panel"><h2><span class="ic" style="background:#ff6f9122">🛍️</span> E-shop odměn</h2>
+    <div class="subtle">Utrať nasbírané mince za firemní předměty. Nákupy vidí administrátor.</div>
+    <div class="grid">${SHOP.map(it=>{const qty=u.inventory[it.id]||0,can=u.coins>=it.cost;
+      return `<div class="card">${qty?`<div class="qty">×${qty}</div>`:''}<div class="em">${it.emoji}</div><div class="cn">${it.name}</div><div class="cd">${it.desc}</div><button class="equipBtn ${can?'can':'locked'}" data-shop="${it.id}" ${can?'':'disabled'}>${it.cost} 🪙</button></div>`;}).join("")}</div></div></div>`;
+  m.querySelectorAll("[data-shop]").forEach(b=>b.onclick=()=>buyShop(b.dataset.shop));
+}
+
+/* ---------- STUDIO (big avatar + accordion) ---------- */
+function renderStudio(m,u){
+  const cats=STUDIO_ORDER,N=cats.length,cx=180,cy=180,R=150;
+  const arc=cats.map((cat,idx)=>{const c=CUSTOM[cat];const th=(-90+360*idx/N)*Math.PI/180;
+    const bx=cx+R*Math.cos(th),by=cy+R*Math.sin(th);const sel=state.studioOpen===cat;
+    return `<button class="simsCat ${sel?'sel':''}" data-sec="${cat}" title="${c.name}" style="left:${(bx-25).toFixed(1)}px;top:${(by-25).toFixed(1)}px">${c.emoji}</button>`;}).join("");
+  m.innerHTML=`<div class="screen">
+    <div class="panel simsPanel"><div class="simsStage2"><div class="simsAvatar2" id="avatarPreview">${operatorSVG(avatarConfig(u))}</div>${arc}</div>
+      <div class="simsHint" id="studioHint">${studioHintText()}</div></div>
+    <div id="studioItems">${studioItemsHTML(u,state.studioOpen)}</div></div>`;
+  m.querySelectorAll('.simsCat').forEach(b=>b.onclick=()=>studioSelect(b.dataset.sec));
+  wireStudioItems();
+}
+function studioHintText(){return state.studioOpen?CUSTOM[state.studioOpen].emoji+' '+CUSTOM[state.studioOpen].name+' — vyber kus níže':'Klikni na ikonu okolo operátora a uprav si vzhled';}
+function studioItemsHTML(u,cat){
+  if(!cat)return '';
+  const c=CUSTOM[cat];
+  const items=c.items.map(it=>{const owned=u.ownedCustom.includes(it.id),equipped=u.equip[cat]===it.id;
+    let btn;if(equipped)btn=`<button class="equipBtn eq" disabled>✓ nasazeno</button>`;
+    else if(owned)btn=`<button class="equipBtn can" data-equip="${cat}:${it.id}">Nasadit</button>`;
+    else{const can=u.coins>=it.cost;btn=`<button class="equipBtn ${can?'can':'locked'}" data-cbuy="${cat}:${it.id}" ${can?'':'disabled'}>${it.cost} 🪙</button>`;}
+    let sw;
+    if((cat==='hairColor'||cat==='shirt'||cat==='skin')&&it.val)sw=`<div class="em" style="height:40px;display:flex;align-items:center;justify-content:center"><span style="width:34px;height:34px;border-radius:50%;background:${it.val};border:2px solid #fff;box-shadow:var(--shadowSoft)"></span></div>`;
+    else if(cat==='background'&&it.val)sw=`<div class="em" style="height:40px;display:flex;align-items:center;justify-content:center"><span style="width:38px;height:38px;border-radius:11px;background:linear-gradient(160deg,${it.val[0]},${it.val[1]});border:2px solid #fff;box-shadow:var(--shadowSoft)"></span></div>`;
+    else sw=`<div class="em">${customIcon(cat,it)}</div>`;
+    return `<div class="card">${owned&&!equipped?'<div class="owned" style="background:#4f9dff">máš</div>':''}${sw}<div class="cn">${it.name}</div><div class="cd"></div>${btn}</div>`;}).join("");
+  return `<div class="panel" style="margin-bottom:0"><h2><span class="ic" style="background:#ff8a5b22">${c.emoji}</span> ${c.name}</h2><div class="grid">${items}</div></div>`;
+}
+function wireStudioItems(){
+  document.querySelectorAll('#studioItems [data-cbuy]').forEach(b=>b.onclick=()=>studioBuy(b.dataset.cbuy));
+  document.querySelectorAll('#studioItems [data-equip]').forEach(b=>b.onclick=()=>studioEquip(b.dataset.equip));
+}
+function studioItemsRefresh(){const el=document.getElementById('studioItems');if(el){el.innerHTML=studioItemsHTML(me(),state.studioOpen);wireStudioItems();}}
+function studioAvatarRefresh(){const el=document.getElementById('avatarPreview');if(!el)return;el.innerHTML=operatorSVG(avatarConfig(me()));el.style.transform='translate(-50%,-50%) scale(1.07)';setTimeout(()=>{el.style.transform='translate(-50%,-50%)';},170);}
+function studioSelect(cat){state.studioOpen=(state.studioOpen===cat?null:cat);sfx.click();
+  document.querySelectorAll('.simsCat').forEach(b=>b.classList.toggle('sel',b.dataset.sec===state.studioOpen));
+  const h=document.getElementById('studioHint');if(h)h.textContent=studioHintText();
+  studioItemsRefresh();}
+function studioBuy(key){const p=key.split(':'),cat=p[0],id=p[1];const u=me();const it=CUSTOM[cat].items.find(x=>x.id===id);
+  if(!it||u.coins<it.cost||u.ownedCustom.includes(id))return;u.coins-=it.cost;u.ownedCustom.push(id);u.equip[cat]=id;saveDB();sfx.coin();
+  studioAvatarRefresh();studioItemsRefresh();refreshChrome();toast('✨ '+it.name);}
+function studioEquip(key){const p=key.split(':'),cat=p[0],id=p[1];const u=me();if(!u.ownedCustom.includes(id))return;u.equip[cat]=id;saveDB();sfx.click();
+  studioAvatarRefresh();studioItemsRefresh();refreshChrome();}
+function refreshChrome(){const u=me();const cc=document.getElementById('coinCount');if(cc)cc.textContent=u.coins;const mv=document.getElementById('miniAvBox');if(mv)mv.innerHTML=operatorSVG(avatarConfig(u));}
+function customIcon(cat,it){
+  if(cat==='hair')return {short:'✂️',long:'💇',bun:'🧑‍🦱',ponytail:'💁',afro:'🌀',mohawk:'🎸',bald:'👨‍🦲'}[it.val]||'💇';
+  if(cat==='hat')return {none:'🚫',cap:'🧢',beanie:'🎿',party:'🥳',headband:'🎀',santa:'🎅',tophat:'🎩'}[it.val]||'🎩';
+  if(cat==='glasses')return {none:'🚫',round:'👓',sun:'🕶️',threed:'🥽',heart:'😍',monocle:'🧐'}[it.val]||'👓';
+  if(cat==='beard')return {none:'🚫',stubble:'🧔',mustache:'👨',full:'🧔‍♂️'}[it.val]||'🧔';
+  if(cat==='accessory')return {none:'🚫',earring:'💎',tie:'👔',bowtie:'🎀',flower:'🌸'}[it.val]||'💎';
+  return '🎨';
+}
+function wireUserView(u){
+  document.querySelectorAll("[data-mand]").forEach(r=>r.onclick=()=>showMandatoryDetail(r.dataset.mand));
+  document.querySelectorAll("[data-el]").forEach(c=>c.onclick=()=>startElearning(c.dataset.el));
+  const pw=document.getElementById("pwBtn");if(pw)pw.onclick=changePasswordModal;const rs=document.getElementById("roomShopBtn");if(rs)rs.onclick=roomShopModal;wireRoom();
+}
+function buyShop(id){const u=me();const it=SHOP.find(x=>x.id===id);if(!it||u.coins<it.cost)return;
+  u.coins-=it.cost;u.inventory[id]=(u.inventory[id]||0)+1;
+  DB.activity.unshift({type:'purchase',user:DB.session,display:u.display,item:it.name,emoji:it.emoji,cost:it.cost,ts:Date.now()});
+  if(DB.activity.length>300)DB.activity.length=300;saveDB();sfx.coin();toast(it.emoji+" Koupeno: "+it.name);renderUser();}
+function buyCustom(key){const p=key.split(":"),cat=p[0],id=p[1];const u=me();const it=CUSTOM[cat].items.find(x=>x.id===id);
+  if(!it||u.coins<it.cost||u.ownedCustom.includes(id))return;
+  u.coins-=it.cost;u.ownedCustom.push(id);u.equip[cat]=id;saveDB();sfx.coin();toast("✨ Odemčeno a nasazeno: "+it.name);renderUser();}
+function equipCustom(key){const p=key.split(":"),cat=p[0],id=p[1];const u=me();if(!u.ownedCustom.includes(id))return;u.equip[cat]=id;saveDB();sfx.click();renderUser();}
+function showMandatoryDetail(id){const u=me();const t=DB.mandatory.find(x=>x.id===id);if(!t)return;sfx.click();const done=u.mandatory[id]==='completed';
+  showModal(`<div style="font-size:52px;text-align:center;margin:2px 0">${done?'✅':'📘'}</div><h2>${esc(t.title)}</h2>
+    <div class="detailMeta"><div>📅 <b>Termín:</b> ${fmtDate(t.date)}</div><div>🎁 <b>Odměna:</b> ${t.coins} mincí (po schválení adminem)</div><div>📊 <b>Úroveň:</b> ${t.level} → ${t.level+1}</div><div>🔖 <b>Stav:</b> ${done?'splněno ✅':'čeká na schválení administrátorem ⏳'}</div></div>
+    <p style="text-align:left">${esc(t.desc)}</p><button class="modalBtn" id="okBtn">Zavřít</button>`);
+  document.getElementById("okBtn").onclick=()=>{sfx.click();hideModal();};}
+function changePasswordModal(){sfx.click();const u=me();
+  showModal(`<h2>Změna hesla</h2><div class="field"><label>Současné heslo</label><input id="pOld" type="password"></div>
+    <div class="field"><label>Nové heslo</label><input id="pNew" type="password"></div><div class="field"><label>Nové heslo znovu</label><input id="pNew2" type="password"></div>
+    <div class="err" id="pErr"></div><div style="display:flex;gap:10px"><button class="modalBtn grey" id="pCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="pSave" style="flex:1">Uložit heslo</button></div>`);
+  document.getElementById("pCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("pSave").onclick=()=>{const old=document.getElementById("pOld").value||"",n1=document.getElementById("pNew").value||"",n2=document.getElementById("pNew2").value||"";const err=document.getElementById("pErr");
+    if(old!==u.pass){err.textContent="Současné heslo nesouhlasí.";sfx.bad();return;}
+    if(n1.length<3){err.textContent="Nové heslo musí mít aspoň 3 znaky.";return;}
+    if(n1!==n2){err.textContent="Nová hesla se neshodují.";return;}
+    u.pass=n1;saveDB();sfx.coin();hideModal();toast("🔑 Heslo změněno");};}
+
+/* ---------- E-LEARNING QUIZ ---------- */
+let quiz=null;
+function startElearning(id){const el=DB.elearning.find(x=>x.id===id);if(!el||!el.q||!el.q.length)return;if((el.level||1)>userLevel(me())){toast("🔒 Odemkne se na Levelu "+(el.level||1));return;}quiz={el,idx:0,correct:0,res:[],detail:[],startTs:Date.now()};renderELQuiz();}
+function renderELQuiz(){
+  const el=quiz.el,item=el.q[quiz.idx],mood=MOODS[item.mood]||MOODS.klidny,total=el.q.length;
+  let dots="";for(let i=0;i<total;i++){let cls=i<quiz.idx?(quiz.res[i]?'ok':'bad'):(i===quiz.idx?'cur':'');dots+=`<div class="pdot ${cls}"></div>`;}
+  app.innerHTML=`${topbar(me())}<main id="main"><div class="screen">
+    <div class="tHead"><button class="iconBtn" id="qBack">← Zpět</button><div class="tTitle">${el.icon||'🎓'} ${esc(el.title)}</div><div class="progDots">${dots}</div></div>
+    <div class="callStage"><div class="timerBar" id="timerBar" style="width:100%"></div>
+      <div class="callRow"><div class="custAv">${customerSVG(mood.face)}</div><div class="speech"><span class="moodTag" style="background:${mood.tagBg};color:${mood.tagC}">${mood.label} zákazník</span><br>„${esc(item.cust)}"</div></div>
+      <div class="scenario">📋 ${esc(item.sc)}</div><div class="qLabel">${esc(item.q)}</div>
+      <div class="answers" id="answers">${item.a.map((t,i)=>`<button class="ans" data-i="${i}"><span class="key">${String.fromCharCode(65+i)}</span><span>${esc(t)}</span></button>`).join("")}</div>
+      <div class="feedback" id="feedback"></div><button class="nextBtn" id="nextBtn"></button></div></div></main>`;
+  wireChrome();quiz.answered=false;
+  document.getElementById("qBack").onclick=()=>{sfx.click();stopTimer();state.tab="elearning";renderUser();};
+  document.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answerELQuiz(parseInt(b.dataset.i)));
+  startTimer(24);
+}
+let timerRAF=null,timerEnd=0,timerTotal=0;
+function startTimer(sec){timerTotal=sec*1000;timerEnd=performance.now()+timerTotal;const bar=document.getElementById("timerBar");
+  function tick(now){const left=Math.max(0,timerEnd-now);if(bar)bar.style.width=(left/timerTotal*100)+"%";if(left<=0){if(quiz&&!quiz.answered)answerELQuiz(-1,true);return;}timerRAF=requestAnimationFrame(tick);}timerRAF=requestAnimationFrame(tick);}
+function stopTimer(){if(timerRAF)cancelAnimationFrame(timerRAF);timerRAF=null;}
+function answerELQuiz(i,timedOut){if(quiz.answered)return;quiz.answered=true;stopTimer();
+  const el=quiz.el,item=el.q[quiz.idx],ok=(i===item.correct);quiz.res[quiz.idx]=ok;if(ok)quiz.correct++;
+  quiz.detail.push({q:item.q,chosen:i>=0?item.a[i]:'(vypršel čas – bez odpovědi)',correct:item.a[item.correct],ok});
+  document.querySelectorAll(".ans").forEach(b=>{const bi=parseInt(b.dataset.i);b.disabled=true;if(bi===item.correct)b.classList.add("correct");else if(bi===i)b.classList.add("wrong");else b.classList.add("dim");});
+  const fb=document.getElementById("feedback");
+  if(ok){sfx.good();fb.className="feedback good show";fb.innerHTML=`<div class="fT">✅ Správně!</div>${esc(item.good)}`;}
+  else{sfx.bad();fb.className="feedback bad show";fb.innerHTML=`<div class="fT">${timedOut?'⏰ Vypršel čas!':'❌ Ne tak docela'}</div>${esc(item.bad)}`;}
+  const nb=document.getElementById("nextBtn");nb.className="nextBtn show";nb.textContent=(quiz.idx<el.q.length-1)?"Další scénář →":"Dokončit 🎉";
+  nb.onclick=()=>{sfx.click();if(quiz.idx<el.q.length-1){quiz.idx++;renderELQuiz();}else finishELQuiz();};}
+function finishELQuiz(){
+  const u=me(),el=quiz.el;const total=el.q.length;const passed=quiz.correct>=Math.ceil(total*0.6);const first=!u.elearning[el.id];
+  const duration=Math.max(1,Math.round((Date.now()-quiz.startTs)/1000));
+  let earned=0;if(passed){if(first){earned=el.coins;u.coins+=earned;}u.elearning[el.id]=true;}
+  DB.results.unshift({user:DB.session,display:u.display,elId:el.id,title:el.title,correct:quiz.correct,total,percent:Math.round(quiz.correct/total*100),durationSec:duration,mistakes:quiz.detail.filter(d=>!d.ok),ts:Date.now(),passed});
+  if(DB.results.length>300)DB.results.length=300;saveDB();
+  const perfect=quiz.correct===total;let conf=passed?confetti():"";let inner;
+  if(passed){sfx.level();inner=`${conf}<div style="font-size:64px;text-align:center;margin:4px 0">${perfect?'🏆':'🎓'}</div><h2>${perfect?'Perfektní!':'Splněno!'}</h2><p>${esc(el.title)} máš hotové.${first?'':' (už dřív splněno – bez dalších mincí)'}</p>
+    <div class="rewardRow"><div class="rw">Mince<b>+${earned}</b></div><div class="rw">Skóre<b>${quiz.correct}/${total}</b></div><div class="rw">Čas<b>${fmtDur(duration)}</b></div></div><button class="modalBtn" id="okBtn">Zpět na e-learning</button>`;}
+  else{sfx.bad();inner=`<div style="font-size:64px;text-align:center;margin:4px 0">💪</div><h2>Skoro!</h2><p>Potřebuješ aspoň ${Math.ceil(total*0.6)} z ${total}. Zkus to znovu.</p>
+    <div class="rewardRow"><div class="rw">Skóre<b>${quiz.correct}/${total}</b></div><div class="rw">Čas<b>${fmtDur(duration)}</b></div></div><button class="modalBtn" id="okBtn">Zkusit znovu</button>`;}
+  showModal(inner);document.getElementById("okBtn").onclick=()=>{sfx.click();hideModal();if(!passed){startElearning(el.id);}else{state.tab="elearning";renderUser();}};
+}
+
+/* ==========================================================================
+   GAMES
+   ========================================================================== */
+let G=null,gTimerRAF=null;
+function renderGames(m,u){
+  m.innerHTML=`<div class="screen"><div class="panel"><h2><span class="ic" style="background:#4f9dff22">🎮</span> Vzdělávací hry</h2>
+    <div class="subtle">Procvič si péči o zákazníka zábavnou formou. Za splnění získáš mince (opakování dává menší odměnu).</div>
+    <div class="grid g2">${GAMES.map(g=>{const played=(g.id in u.games);
+      return `<div class="card buy" data-game="${g.id}"><div class="em">${g.emoji}</div><div class="cn">${g.name}</div><div class="cd">${g.desc}</div><div class="rw" style="margin-top:8px;display:inline-block">${played?'zahrát znovu':'hrát'}</div></div>`;}).join("")}</div></div></div>`;
+  m.querySelectorAll("[data-game]").forEach(c=>c.onclick=()=>startGame(c.dataset.game));
+}
+function startGame(id){sfx.click();if(id==="game_cross")gStartCross();else if(id==="game_quiz")gStartQuiz();else gStartMemory();}
+function gameHeader(title){return `<div class="tHead"><button class="iconBtn" id="gBack">← Zpět</button><div class="tTitle">${title}</div></div>`;}
+function gStopTimer(){if(gTimerRAF)cancelAnimationFrame(gTimerRAF);gTimerRAF=null;}
+function wireGBack(){document.getElementById("gBack").onclick=()=>{sfx.click();gStopTimer();state.tab="hry";renderUser();};}
+
+/* Game: Křížovka */
+function gStartCross(){G={id:"game_cross"};gRenderCross();}
+function gRenderCross(){const cw=CROSSWORD;
+  const rowsHtml=cw.rows.map((r,ri)=>{const start=cw.centralCol-r.cross;let cells="";
+    for(let g=0;g<start;g++)cells+=`<div class="cwGap"></div>`;
+    for(let ci=0;ci<r.a.length;ci++){const col=start+ci;const cross=col===cw.centralCol?'cross':'';cells+=`<input class="cwCell ${cross}" data-r="${ri}" data-i="${ci}" maxlength="1" autocomplete="off">`;}
+    return `<div class="cwRow"><div class="cwNum">${ri+1}</div>${cells}</div>`;}).join("");
+  const clues=cw.rows.map((r,ri)=>`<div class="cwClue"><b>${ri+1}.</b> ${esc(r.clue)}</div>`).join("");
+  app.innerHTML=`${topbar(me())}<main id="main"><div class="screen gameWrap">${gameHeader("🧩 Křížovka s tajenkou")}
+    <div class="panel"><div class="subtle">Vylušti pojmy z péče o zákazníka. Písmena ve zvýrazněném sloupci prozradí <b>tajenku</b>. (Piš bez háčků a čárek.)</div>
+      <div class="cwWrap"><div class="cwGrid">${rowsHtml}</div></div>
+      <div id="cwMsg" style="text-align:center;font-weight:800;margin:8px 0;min-height:20px"></div>
+      <button class="nextBtn show" id="cwCheck" style="margin-top:2px">Zkontrolovat ✔️</button></div>
+    <div class="panel" style="margin-bottom:0"><h2 style="font-size:15px"><span class="ic" style="background:#ffcf4d22">📜</span> Nápovědy</h2>${clues}</div></div></main>`;
+  wireChrome();wireGBack();
+  document.querySelectorAll('.cwCell').forEach(inp=>{
+    inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase().slice(0,1);inp.classList.remove('ok','bad');if(inp.value){const n=cwSibling(inp,1);if(n)n.focus();}});
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value){const p=cwSibling(inp,-1);if(p){p.focus();}}});
+  });
+  document.getElementById('cwCheck').onclick=cwCheck;
+}
+function cwSibling(inp,dir){const r=inp.dataset.r;const cells=[...document.querySelectorAll('.cwCell[data-r="'+r+'"]')];const i=cells.indexOf(inp);return cells[i+dir]||null;}
+function cwCheck(){const cw=CROSSWORD;let allOk=true;
+  cw.rows.forEach((r,ri)=>{const cells=[...document.querySelectorAll('.cwCell[data-r="'+ri+'"]')];
+    r.a.split('').forEach((ch,ci)=>{const cell=cells[ci];const v=(cell.value||'').toUpperCase();cell.classList.remove('ok','bad');
+      if(v===ch)cell.classList.add('ok');else{cell.classList.add('bad');allOk=false;}});});
+  const msg=document.getElementById('cwMsg');
+  if(allOk){msg.style.color='var(--greenD)';msg.textContent='🎉 Správně! Tajenka: '+cw.secret;sfx.level();setTimeout(()=>gFinish('game_cross',cw.rows.length,cw.rows.length,cw.coins),450);}
+  else{msg.style.color='var(--red)';msg.textContent='Něco ještě nesedí – oprav červená políčka.';sfx.bad();}
+}
+
+/* Game: Kvíz (game-show) */
+function gStartQuiz(){G={id:"game_quiz",list:shuffle(GAME_QUIZ).slice(0,6),idx:0,correct:0,score:0,streak:0,answered:false};gRenderQuiz();}
+function gRenderQuiz(){const item=G.list[G.idx];const shapes=['▲','◆','●','■'];
+  app.innerHTML=`${topbar(me())}<main id="main"><div class="screen gameWrap">${gameHeader("❓ Kvíz")}
+    <div class="scoreBar"><div class="scorePill">Otázka ${G.idx+1}/${G.list.length}</div><div class="scorePill">🏆 ${G.score}</div><div class="scorePill streak">🔥 ${G.streak}</div></div>
+    <div class="qCardBig"><div class="qn">OTÁZKA ${G.idx+1}</div><div class="qt">${esc(item.q)}</div><div class="gTimer"><div class="gTimerFill" id="qTimer" style="width:100%"></div></div></div>
+    <div class="qTiles" id="qTiles">${item.a.map((t,i)=>`<button class="qTile t${i}" data-i="${i}"><span class="sh">${shapes[i]}</span><span>${esc(t)}</span></button>`).join("")}</div>
+    <button class="nextBtn" id="gNext"></button></div></main>`;
+  wireChrome();wireGBack();G.answered=false;
+  document.querySelectorAll('#qTiles .qTile').forEach(b=>b.onclick=()=>gQuizAnswer(parseInt(b.dataset.i)));
+  gQuizTimer(10);
+}
+function gQuizTimer(sec){const end=performance.now()+sec*1000;const bar=document.getElementById('qTimer');
+  function tick(now){const left=Math.max(0,end-now);if(bar)bar.style.width=(left/(sec*1000)*100)+'%';if(left<=0){if(!G.answered)gQuizAnswer(-1);return;}gTimerRAF=requestAnimationFrame(tick);}gTimerRAF=requestAnimationFrame(tick);}
+function gQuizAnswer(i){if(G.answered)return;G.answered=true;gStopTimer();const item=G.list[G.idx];const ok=i===item.c;
+  if(ok){G.correct++;G.streak++;G.score+=100+(G.streak-1)*20;sfx.good();}else{G.streak=0;sfx.bad();}
+  document.querySelectorAll('#qTiles .qTile').forEach(b=>{const bi=parseInt(b.dataset.i);b.disabled=true;if(bi===item.c)b.classList.add('correct');else b.classList.add('wrong');});
+  const nb=document.getElementById('gNext');nb.className='nextBtn show';nb.textContent=G.idx<G.list.length-1?'Další →':'Dokončit 🎉';
+  nb.onclick=()=>{sfx.click();if(G.idx<G.list.length-1){G.idx++;gRenderQuiz();}else gFinish('game_quiz',G.correct,G.list.length,G.correct*3);};}
+
+/* Game: Pexeso */
+function gStartMemory(){const pairs=shuffle(GAME_PAIRS).slice(0,6);let cards=[];
+  pairs.forEach((p,pid)=>{cards.push({pid,emoji:p.emoji,term:p.term});cards.push({pid,emoji:p.emoji,term:p.term});});
+  cards=shuffle(cards).map((c,i)=>({...c,i,st:"hidden"}));G={id:"game_memory",cards,first:null,matched:0,moves:0,lock:false};gRenderMemory();}
+function gRenderMemory(){const cells=G.cards.map(c=>`<div class="memCard ${c.st==='hidden'?'':c.st}" data-i="${c.i}">${memFace(c)}</div>`).join("");
+  app.innerHTML=`${topbar(me())}<main id="main"><div class="screen gameWrap">${gameHeader("🃏 Pexeso pojmů")}
+    <div class="panel"><div class="subtle">Otoč dvě kartičky a najdi <b>dvě stejné</b> (obrázek + pojem). Tahů: <b>${G.moves}</b> · Dvojic: <b>${G.matched}/6</b></div>
+    <div class="memGrid">${cells}</div></div></div></main>`;
+  wireChrome();wireGBack();
+  document.querySelectorAll(".memCard").forEach(el=>el.onclick=()=>gMemFlip(parseInt(el.dataset.i)));
+}
+function memFace(c){if(c.st==='hidden')return '?';return '<span style="font-size:30px;line-height:1.1">'+c.emoji+'</span><span style="font-size:11px;font-weight:800;margin-top:2px">'+esc(c.term)+'</span>';}
+function gMemFlip(i){if(G.lock)return;const c=G.cards[i];if(c.st!=="hidden")return;c.st="flip";sfx.click();
+  if(G.first==null){G.first=i;gRenderMemory();return;}
+  if(G.first===i){gRenderMemory();return;}
+  G.moves++;const a=G.cards[G.first],b=c;
+  if(a.pid===b.pid){a.st="matched";b.st="matched";G.matched++;G.first=null;sfx.good();
+    if(G.matched===6){gRenderMemory();const base=Math.max(8,30-Math.max(0,(G.moves-6))*2);setTimeout(()=>gFinish("game_memory",6,6,base),450);}else gRenderMemory();}
+  else{G.lock=true;gRenderMemory();setTimeout(()=>{a.st="hidden";b.st="hidden";G.first=null;G.lock=false;gRenderMemory();},750);}
+}
+function gFinish(gid,score,total,base){
+  const u=me();const first=!(gid in u.games);const earned=first?base:Math.ceil(base/3);
+  if(earned>0)u.coins+=earned;u.games[gid]=Math.max(u.games[gid]||0,score);saveDB();
+  const perfect=score===total;if(earned>0)sfx.level();else sfx.click();
+  showModal(`${confetti()}<div style="font-size:64px;text-align:center;margin:4px 0">${perfect?'🏆':'🎉'}</div><h2>${perfect?'Perfektní!':'Hotovo!'}</h2><p>${first?'Skvělá práce!':'Za opakování je odměna menší.'}</p>
+    <div class="rewardRow"><div class="rw">Mince<b>+${earned}</b></div><div class="rw">Skóre<b>${score}/${total}</b></div></div><button class="modalBtn" id="okBtn">Zpět na hry</button>`);
+  document.getElementById("okBtn").onclick=()=>{sfx.click();hideModal();state.tab="hry";renderUser();};
+}
+
+/* ==========================================================================
+   ADMIN
+   ========================================================================== */
+function roomCaption(u){const r=u.room||{};const bene=curTier(u).items.find(it=>it.benefit);
+  if(bene&&r.owned[bene.id]&&r.shown[bene.id]!==false){const s=(r.plant&&r.plant.stage)||0;return s>=3?'🌸 Rostlina vykvetla! Klikni na ni a sklidni mince.':'🌱 Klikni na rostlinu a zalévej ji – když vykvete, dá ti mince.';}
+  return Object.keys(r.owned||{}).length?'Klikni na 🛒 obchod a dozařiď kancelář.':'Kancelář je zatím prázdná – zajdi do 🛒 obchodu.';}
+function plantSVG(variant,stage){
+  let pot,fol;
+  if(variant==="monstera"){pot=`<path d="M338 208 l30 0 -4 24 -22 0z" fill="#5b8f6a"/><rect x="335" y="204" width="36" height="8" rx="3" fill="#487a58"/>`;
+    if(stage>=3)fol=`<g class="rSway"><path d="M353 206 q0 -34 0 -46" stroke="#2f9e63" stroke-width="4" fill="none"/><path d="M353 178 q-24 -6 -30 -24 q22 -2 30 12 q-8 4 0 12z" fill="#39c07c"/><path d="M353 172 q24 -6 30 -24 q-22 -2 -30 12 q8 4 0 12z" fill="#4bd08a"/><path d="M353 160 q-16 -6 -18 -20 q14 0 18 10z" fill="#39c07c"/></g>`;
+    else if(stage===2)fol=`<g class="rSway"><path d="M353 206 q0 -24 0 -32" stroke="#2f9e63" stroke-width="4" fill="none"/><path d="M353 186 q-22 -6 -28 -20 q20 -2 28 10z" fill="#39c07c"/><path d="M353 182 q22 -6 28 -20 q-20 -2 -28 10z" fill="#4bd08a"/></g>`;
+    else fol=`<g class="rSway"><path d="M353 206 q-2 -16 -12 -20 q10 -2 14 8z" fill="#39c07c"/><path d="M353 206 q2 -14 12 -16 q-8 -2 -14 8z" fill="#4bd08a"/></g>`;
+  } else if(variant==="bonsai"){pot=`<path d="M330 214 l46 0 -5 14 -36 0z" fill="#8a5a3c"/><rect x="326" y="210" width="54" height="7" rx="3" fill="#6f4630"/>`;
+    if(stage>=3)fol=`<g class="rSway"><path d="M353 210 q-4 -18 4 -30" stroke="#6f4630" stroke-width="5" fill="none"/><path d="M357 182 q-14 2 -20 -4" stroke="#6f4630" stroke-width="4" fill="none"/><ellipse cx="342" cy="176" rx="16" ry="10" fill="#ff9ec4"/><ellipse cx="366" cy="180" rx="15" ry="9" fill="#ff8fab"/><ellipse cx="356" cy="166" rx="14" ry="9" fill="#ffb3d1"/></g>`;
+    else if(stage===2)fol=`<g class="rSway"><path d="M353 210 q-3 -14 3 -24" stroke="#6f4630" stroke-width="5" fill="none"/><ellipse cx="346" cy="184" rx="14" ry="9" fill="#39c07c"/><ellipse cx="364" cy="186" rx="12" ry="8" fill="#4bd08a"/></g>`;
+    else fol=`<g class="rSway"><path d="M353 210 q-2 -10 2 -16" stroke="#6f4630" stroke-width="5" fill="none"/><ellipse cx="352" cy="192" rx="11" ry="7" fill="#39c07c"/></g>`;
+  } else {pot=`<path d="M338 206 l30 0 -4 26 -22 0z" fill="#e07a5f"/><rect x="335" y="202" width="36" height="8" rx="3" fill="#c9634a"/>`;
+    if(stage>=3)fol=`<g class="rSway"><path d="M353 204 q-2 -30 0 -44" stroke="#2f9e63" stroke-width="4" fill="none"/><path d="M353 190 q-16 -4 -22 -16 q14 -2 22 8z" fill="#39c07c"/><path d="M353 184 q16 -4 22 -16 q-14 -2 -22 8z" fill="#39c07c"/><circle cx="353" cy="158" r="4" fill="#ffcf4d"/><circle cx="345" cy="152" r="6" fill="#ff8fab"/><circle cx="361" cy="152" r="6" fill="#ff8fab"/><circle cx="347" cy="164" r="6" fill="#ff8fab"/><circle cx="359" cy="164" r="6" fill="#ff8fab"/></g>`;
+    else if(stage===2)fol=`<g class="rSway"><path d="M353 204 q-2 -22 0 -32" stroke="#2f9e63" stroke-width="4" fill="none"/><path d="M353 188 q-16 -4 -22 -14 q14 -2 22 8z" fill="#39c07c"/><path d="M353 184 q16 -4 22 -14 q-14 -2 -22 8z" fill="#39c07c"/><path d="M353 178 q-2 -8 4 -12 q3 8 -4 14z" fill="#4bd08a"/></g>`;
+    else fol=`<g class="rSway"><path d="M353 205 q-3 -14 -11 -18" stroke="#39c07c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M353 205 q3 -12 11 -14" stroke="#39c07c" stroke-width="4" fill="none" stroke-linecap="round"/></g>`;}
+  const coin=stage>=3?`<g class="rFloatY"><circle cx="353" cy="140" r="8" fill="#ffe27a" stroke="#e0a92e" stroke-width="1.5"/><circle cx="353" cy="140" r="3.5" fill="#f0b429"/></g>`:'';
+  return `<g id="roomPlant" style="cursor:pointer">${pot}${fol}${coin}</g>`;
+}
+function roomItemSVG(id,u){
+  const stage=((u.room.plant&&u.room.plant.stage)||0);
+  // TIER 1
+  if(id==="picture")return `<g><rect x="55" y="40" width="80" height="58" rx="4" fill="#c9a06a"/><rect x="61" y="46" width="68" height="46" fill="#bfe6ff"/><path d="M61 92 l22 -24 14 12 12 -16 20 28z" fill="#8fd6a0"/><circle cx="116" cy="58" r="7" fill="#ffe27a"/></g>`;
+  if(id==="window")return `<g><rect x="250" y="28" width="112" height="88" rx="8" fill="#ffffff" stroke="#cdd8e6" stroke-width="4"/><rect x="256" y="34" width="100" height="76" rx="5" fill="#bfe6ff"/><circle cx="288" cy="58" r="12" fill="#ffe27a"/><g class="rCloudA"><ellipse cx="316" cy="72" rx="16" ry="8" fill="#ffffff"/><ellipse cx="328" cy="70" rx="10" ry="6" fill="#ffffff"/></g><line x1="306" y1="34" x2="306" y2="110" stroke="#ffffff" stroke-width="5"/><line x1="256" y1="72" x2="356" y2="72" stroke="#ffffff" stroke-width="5"/></g>`;
+  if(id==="rug")return `<g><ellipse cx="200" cy="236" rx="150" ry="22" fill="#ffd9c2"/><ellipse cx="200" cy="236" rx="118" ry="16" fill="none" stroke="#ff8a5b" stroke-width="3" opacity=".5"/></g>`;
+  if(id==="lamp")return `<g><ellipse cx="34" cy="236" rx="18" ry="6" fill="rgba(0,0,0,.08)"/><rect x="31" y="150" width="6" height="86" fill="#8a94a6"/><ellipse cx="34" cy="150" rx="24" ry="10" fill="#fff2b8" class="rGlow"/><path d="M16 150 l36 0 -7 -26 -22 0z" fill="#ffd36b"/></g>`;
+  if(id==="cat")return `<g><ellipse cx="96" cy="236" rx="26" ry="6" fill="rgba(0,0,0,.08)"/><g class="rTail"><path d="M74 226 q-18 -2 -14 -22" stroke="#a97c5a" stroke-width="7" fill="none" stroke-linecap="round"/></g><path d="M78 236 q-2 -42 18 -42 q20 0 18 42z" fill="#a97c5a"/><path d="M82 190 l-5 -12 12 5z" fill="#a97c5a"/><path d="M110 190 l5 -12 -12 5z" fill="#a97c5a"/><circle cx="96" cy="198" r="16" fill="#b98a64"/><g class="rBlinkG"><circle cx="90" cy="197" r="2.6" fill="#2b2b2b"/><circle cx="102" cy="197" r="2.6" fill="#2b2b2b"/></g><path d="M96 202 l-3 3 3 2 3 -2z" fill="#e07a9a"/><path d="M92 205 q4 3 8 0" stroke="#5b3a29" stroke-width="1.5" fill="none"/></g>`;
+  if(id==="desk")return `<g><rect x="128" y="170" width="168" height="14" rx="5" fill="#b5794a"/><rect x="128" y="168" width="168" height="6" rx="3" fill="#c98b57"/><rect x="134" y="184" width="12" height="46" rx="2" fill="#9c6337"/><rect x="278" y="184" width="12" height="46" rx="2" fill="#9c6337"/></g>`;
+  if(id==="pc")return `<g><rect x="168" y="128" width="60" height="42" rx="5" fill="#3a4250"/><rect x="173" y="133" width="50" height="30" rx="3" fill="#5b8cff" class="rFlick"/><rect x="178" y="140" width="18" height="3" rx="1" fill="#ffffff" opacity=".85"/><rect x="178" y="147" width="30" height="3" rx="1" fill="#ffffff" opacity=".5"/><rect x="192" y="170" width="12" height="8" fill="#2b3240"/><rect x="182" y="178" width="32" height="5" rx="2" fill="#3a4250"/><rect x="182" y="150" width="4" height="8" fill="#ffe27a" class="rBlinkG"/></g>`;
+  if(id==="fishbowl")return `<g><ellipse cx="256" cy="170" rx="20" ry="5" fill="#9fd8ff" opacity=".5"/><path d="M238 158 a18 15 0 0 0 36 0 q0 -3 -18 -3 q-18 0 -18 3z" fill="#bfe9ff" opacity=".85"/><ellipse cx="256" cy="158" rx="18" ry="6" fill="#8fd0ff" opacity=".7"/><g class="rFish"><circle cx="252" cy="163" r="4" fill="#ff8a5b"/><path d="M248 163 l-6 -3 0 6z" fill="#ff8a5b"/></g><path d="M240 158 a18 15 0 0 0 32 0" fill="none" stroke="#7fbfe6" stroke-width="2"/></g>`;
+  if(id==="bin")return `<g class="rWig"><path d="M308 208 l24 0 -3 26 -18 0z" fill="#9aa7b5"/><rect x="305" y="204" width="30" height="6" rx="2" fill="#7f8b99"/><rect x="316" y="200" width="8" height="5" rx="2" fill="#7f8b99"/><line x1="314" y1="213" x2="313" y2="230" stroke="#7f8b99" stroke-width="2"/><line x1="320" y1="213" x2="320" y2="230" stroke="#7f8b99" stroke-width="2"/><line x1="326" y1="213" x2="327" y2="230" stroke="#7f8b99" stroke-width="2"/></g>`;
+  if(id==="plant")return plantSVG("default",stage);
+  // TIER 2
+  if(id==="t2_board")return `<g><rect x="52" y="40" width="86" height="58" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="4"/><line x1="60" y1="54" x2="110" y2="54" stroke="#4f9dff" stroke-width="3"/><line x1="60" y1="64" x2="122" y2="64" stroke="#39c07c" stroke-width="3"/><line x1="60" y1="74" x2="98" y2="74" stroke="#ff8a5b" stroke-width="3"/><rect x="110" y="76" width="18" height="16" rx="2" fill="#ffe27a"/></g>`;
+  if(id==="t2_window")return `<g><rect x="246" y="26" width="116" height="92" rx="8" fill="#ffffff" stroke="#cdd8e6" stroke-width="4"/><rect x="252" y="32" width="104" height="80" rx="5" fill="#bfe6ff"/><circle cx="284" cy="56" r="12" fill="#ffe27a"/><g class="rCloudA"><ellipse cx="316" cy="70" rx="15" ry="7" fill="#ffffff"/></g><line x1="304" y1="32" x2="304" y2="112" stroke="#ffffff" stroke-width="5"/><line x1="252" y1="72" x2="356" y2="72" stroke="#ffffff" stroke-width="5"/></g>`;
+  if(id==="t2_rug")return `<g><ellipse cx="200" cy="236" rx="150" ry="22" fill="#c7d0da"/><ellipse cx="200" cy="236" rx="118" ry="16" fill="none" stroke="#8a94a6" stroke-width="3" opacity=".4"/></g>`;
+  if(id==="t2_sofa")return `<g><ellipse cx="42" cy="236" rx="36" ry="6" fill="rgba(0,0,0,.08)"/><rect x="10" y="200" width="66" height="30" rx="8" fill="#5b8cff"/><rect x="4" y="188" width="16" height="42" rx="7" fill="#4f7fe0"/><rect x="64" y="188" width="16" height="42" rx="7" fill="#4f7fe0"/><rect x="20" y="184" width="46" height="18" rx="7" fill="#6f9bff"/></g>`;
+  if(id==="t2_dog")return `<g><ellipse cx="98" cy="236" rx="26" ry="6" fill="rgba(0,0,0,.08)"/><g class="rTail"><path d="M76 226 q-14 -6 -10 -20" stroke="#c98b57" stroke-width="7" fill="none" stroke-linecap="round"/></g><path d="M80 236 q0 -40 18 -40 q18 0 18 40z" fill="#c98b57"/><circle cx="98" cy="200" r="16" fill="#d8a06a"/><path d="M84 196 q-9 2 -8 16 q8 -3 11 -10z" fill="#b5794a"/><path d="M112 196 q9 2 8 16 q-8 -3 -11 -10z" fill="#b5794a"/><g class="rBlinkG"><circle cx="92" cy="199" r="2.6" fill="#2b2b2b"/><circle cx="104" cy="199" r="2.6" fill="#2b2b2b"/></g><ellipse cx="98" cy="206" rx="4" ry="3" fill="#5b3a29"/></g>`;
+  if(id==="t2_desk")return `<g><rect x="128" y="170" width="168" height="12" rx="5" fill="#e6ebf1"/><rect x="128" y="168" width="168" height="6" rx="3" fill="#f4f7fa"/><rect x="136" y="182" width="10" height="48" fill="#b9c2cd"/><rect x="278" y="182" width="10" height="48" fill="#b9c2cd"/></g>`;
+  if(id==="t2_laptop")return `<g><path d="M176 168 l44 0 6 -30 -56 0z" fill="#3a4250"/><rect x="170" y="166" width="58" height="5" rx="2" fill="#2b3240"/><path d="M181 164 l34 0 4 -22 -42 0z" fill="#5b8cff" class="rFlick"/><rect x="187" y="149" width="16" height="2.5" fill="#ffffff" opacity=".8"/></g>`;
+  if(id==="t2_coffee")return `<g><rect x="244" y="150" width="26" height="24" rx="4" fill="#7f8b99"/><rect x="248" y="170" width="18" height="6" rx="2" fill="#5b6470"/><rect x="250" y="158" width="10" height="8" rx="2" fill="#3a4250"/><g class="rSteam"><path d="M256 148 q-3 -6 0 -11" stroke="#cdd8e6" stroke-width="2.5" fill="none" stroke-linecap="round"/></g></g>`;
+  if(id==="t2_monstera")return plantSVG("monstera",stage);
+  if(id==="t2_books")return `<g><rect x="300" y="216" width="30" height="7" rx="2" fill="#ff6b6b"/><rect x="303" y="209" width="26" height="7" rx="2" fill="#4f9dff"/><rect x="301" y="202" width="30" height="7" rx="2" fill="#39c07c"/><rect x="305" y="223" width="24" height="7" rx="2" fill="#ffcf4d"/></g>`;
+  // TIER 3
+  if(id==="t3_art")return `<g><rect x="52" y="40" width="82" height="58" rx="4" fill="#1e2636"/><circle cx="78" cy="66" r="14" fill="#ff6f91"/><rect x="96" y="52" width="28" height="34" fill="#ffcf4d" opacity=".9"/><path d="M58 92 l24 -18 20 18z" fill="#4f9dff"/></g>`;
+  if(id==="t3_citywin")return `<g><rect x="246" y="26" width="116" height="92" rx="8" fill="#ffffff" stroke="#3a4250" stroke-width="4"/><rect x="252" y="32" width="104" height="80" rx="5" fill="#1b2640"/><rect x="260" y="70" width="12" height="42" fill="#2f3d5e"/><rect x="276" y="58" width="14" height="54" fill="#33456a"/><rect x="294" y="76" width="12" height="36" fill="#2f3d5e"/><rect x="310" y="50" width="16" height="62" fill="#37507a"/><rect x="330" y="72" width="12" height="40" fill="#2f3d5e"/><circle cx="320" cy="46" r="7" fill="#ffe27a"/><circle class="rTw" cx="266" cy="80" r="1.6" fill="#ffe27a"/><circle class="rTw" cx="300" cy="86" r="1.6" fill="#ffe27a"/><circle class="rTw" cx="336" cy="82" r="1.6" fill="#ffe27a"/></g>`;
+  if(id==="t3_rug")return `<g><ellipse cx="200" cy="236" rx="150" ry="22" fill="#7a2d3a"/><ellipse cx="200" cy="236" rx="118" ry="16" fill="none" stroke="#ffcf4d" stroke-width="3" opacity=".5"/></g>`;
+  if(id==="t3_fire")return `<g><rect x="8" y="176" width="70" height="60" rx="6" fill="#3a3f4a"/><rect x="16" y="196" width="54" height="40" rx="4" fill="#1e2229"/><g class="rFlame"><path d="M43 232 q-12 -14 -6 -28 q4 8 8 6 q-4 -12 4 -20 q2 16 10 22 q4 12 -6 20z" fill="#ff8a5b"/><path d="M43 232 q-6 -10 -3 -18 q6 6 6 -2 q3 10 -3 20z" fill="#ffcf4d"/></g><rect x="4" y="170" width="78" height="8" rx="3" fill="#4a505c"/></g>`;
+  if(id==="t3_globe")return `<g><ellipse cx="98" cy="236" rx="20" ry="5" fill="rgba(0,0,0,.14)"/><rect x="94" y="216" width="8" height="16" fill="#8a6d4a"/><path d="M84 216 l28 0 -6 -8 -16 0z" fill="#6f5638"/><g class="rSpin" style="transform-origin:98px 198px"><circle cx="98" cy="198" r="18" fill="#4f9dff"/><path d="M86 192 q10 4 22 -2 q-6 8 -16 8 q-8 -2 -6 -6z" fill="#39c07c"/><path d="M92 205 q8 2 14 -2 q-2 6 -8 6 q-6 0 -6 -4z" fill="#39c07c"/></g><path d="M80 198 a18 18 0 0 0 36 0" fill="none" stroke="#c9a94a" stroke-width="2.5"/></g>`;
+  if(id==="t3_desk")return `<g><rect x="126" y="170" width="172" height="14" rx="5" fill="#3f2d22"/><rect x="126" y="168" width="172" height="6" rx="3" fill="#5a3e2e"/><rect x="132" y="184" width="44" height="46" fill="#33241b"/><rect x="248" y="184" width="44" height="46" fill="#33241b"/><rect x="138" y="192" width="32" height="10" rx="2" fill="#4a352a"/></g>`;
+  if(id==="t3_dualpc")return `<g><rect x="158" y="130" width="38" height="30" rx="4" fill="#2b3240"/><rect x="162" y="134" width="30" height="22" rx="2" fill="#5b8cff" class="rFlick"/><rect x="202" y="130" width="38" height="30" rx="4" fill="#2b3240"/><rect x="206" y="134" width="30" height="22" rx="2" fill="#39c07c" class="rFlick"/><rect x="192" y="160" width="14" height="8" fill="#2b3240"/><rect x="182" y="168" width="34" height="5" rx="2" fill="#3a4250"/></g>`;
+  if(id==="t3_trophy")return `<g><path d="M246 150 q0 16 12 18 q12 -2 12 -18z" fill="#ffcf4d"/><path d="M244 152 q-6 0 -6 -8 q0 -4 6 -4" fill="none" stroke="#ffcf4d" stroke-width="3"/><path d="M272 152 q6 0 6 -8 q0 -4 -6 -4" fill="none" stroke="#ffcf4d" stroke-width="3"/><rect x="254" y="168" width="8" height="6" fill="#e0a92e"/><rect x="248" y="174" width="20" height="5" rx="2" fill="#e0a92e"/><circle class="rTw" cx="258" cy="156" r="2" fill="#ffffff"/></g>`;
+  if(id==="t3_bonsai")return plantSVG("bonsai",stage);
+  if(id==="t3_safe")return `<g><rect x="298" y="200" width="34" height="34" rx="4" fill="#4a505c"/><rect x="303" y="205" width="24" height="24" rx="2" fill="#3a3f4a"/><circle cx="315" cy="217" r="6" fill="#8a94a6"/><circle cx="315" cy="217" r="2" fill="#3a3f4a"/><rect x="324" y="214" width="5" height="6" fill="#8a94a6"/></g>`;
+  return '';
+}
+function roomSVG(u){const r=u.room||{};const t=curTier(u);const wall=r.wall||t.wall,floor=r.floor||t.floor;
+  const items=ROOM_SLOTORDER.map(id=>{if(!r.owned||!r.owned[id]||r.shown[id]===false)return '';return roomItemSVG(id,u);}).join("");
+  return `<svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="400" height="160" fill="${wall}"/><rect x="0" y="158" width="400" height="104" fill="${floor}"/><rect x="0" y="155" width="400" height="5" fill="${shade(floor,-14)}"/><ellipse cx="200" cy="252" rx="220" ry="16" fill="${shade(floor,10)}" opacity=".4"/>${items}</svg>`;
+}
+function wireRoom(){const p=document.getElementById('roomPlant');if(p)p.onclick=plantClick;}
+function roomRefresh(){const el=document.getElementById('roomStage');if(el){el.innerHTML=roomSVG(me());wireRoom();}const c=document.getElementById('roomCap');if(c)c.textContent=roomCaption(me());const h=document.getElementById('roomTier');if(h)h.textContent=curTier(me()).name;}
+function plantClick(){const u=me();u.room.plant=u.room.plant||{stage:1,last:0};const p=u.room.plant;const now=Date.now();
+  if(p.stage>=3){const reward=6;u.coins+=reward;p.stage=1;p.last=now;saveDB();sfx.coin();toast('🌸 Sklidil/a jsi květ! +'+reward+' 🪙');roomRefresh();refreshChrome();return;}
+  if(now-(p.last||0)<3000){toast('💧 Nech ji chvíli napít…');return;}
+  p.stage=Math.min(3,(p.stage||1)+1);p.last=now;saveDB();sfx.click();
+  toast(p.stage>=3?'🌸 Vykvetla! Klikni pro sklizeň.':'💧 Zaléváš… roste!');roomRefresh();}
+function roomShopModal(){sfx.click();showModal(roomShopHTML());wireRoomShop();}
+function roomShopHTML(){const u=me();const r=u.room;const t=curTier(u);const owned=t.items.filter(it=>r.owned[it.id]).length;
+  const items=t.items.map(it=>{const own=!!r.owned[it.id];const shown=r.shown[it.id]!==false;
+    let btn;if(!own){const can=u.coins>=it.cost;btn=`<button class="equipBtn ${can?'can':'locked'}" data-rbuy="${it.id}" ${can?'':'disabled'}>${it.cost} 🪙</button>`;}
+    else btn=`<button class="equipBtn ${shown?'eq':'can'}" data-rtog="${it.id}">${shown?'✓ v místnosti':'Zobrazit'}</button>`;
+    return `<div class="card">${own?'<div class="owned" style="background:'+(shown?'#39c07c':'#8a94a6')+'">'+(shown?'má':'skryto')+'</div>':''}<div class="em">${it.emoji}</div><div class="cn">${it.name}</div><div class="cd">${it.benefit?'✨ '+it.benefit:''}</div>${btn}</div>`;}).join("");
+  const walls=t.walls.map(c=>`<span class="rSwatch ${r.wall===c?'sel':''}" data-rwall="${c}" style="background:${c}"></span>`).join("");
+  const floors=t.floors.map(c=>`<span class="rSwatch ${r.floor===c?'sel':''}" data-rfloor="${c}" style="background:${c}"></span>`).join("");
+  let up='';const tierIdx=(u.room.tier||0);
+  if(roomAllOwned(u)){if(t.nextCost!=null){const can=u.coins>=t.nextCost;up=`<button class="modalBtn" id="roomUp" ${can?'':'disabled'} style="margin-top:12px;background:linear-gradient(135deg,#39c07c,#1f9d5f)${can?'':';opacity:.5'}">⬆️ Upgradovat kancelář · ${t.nextCost} 🪙</button>`;}else up=`<div class="subtle" style="text-align:center;margin-top:12px">👑 Máš nejvyšší úroveň kanceláře!</div>`;}
+  return `<h2>🛒 Obchod kanceláře</h2><p style="margin-bottom:6px"><b>${t.name}</b> · Level ${tierIdx+1}/${ROOM_TIERS.length} · ${owned}/${t.items.length} kusů</p>
+    <div class="catTitle" style="margin-top:2px">🎨 Barva stěny</div><div class="rSwatches">${walls}</div>
+    <div class="catTitle">🪵 Podlaha</div><div class="rSwatches">${floors}</div>
+    <div class="catTitle">🛍️ Nábytek a doplňky</div><div class="grid">${items}</div>${up}
+    <button class="modalBtn grey" id="roomClose" style="margin-top:10px">Hotovo</button>`;
+}
+function wireRoomShop(){
+  document.querySelectorAll('[data-rbuy]').forEach(b=>b.onclick=()=>roomBuy(b.dataset.rbuy));
+  document.querySelectorAll('[data-rtog]').forEach(b=>b.onclick=()=>roomToggle(b.dataset.rtog));
+  document.querySelectorAll('[data-rwall]').forEach(b=>b.onclick=()=>{me().room.wall=b.dataset.rwall;saveDB();sfx.click();roomRefresh();showModal(roomShopHTML());wireRoomShop();});
+  document.querySelectorAll('[data-rfloor]').forEach(b=>b.onclick=()=>{me().room.floor=b.dataset.rfloor;saveDB();sfx.click();roomRefresh();showModal(roomShopHTML());wireRoomShop();});
+  const up=document.getElementById('roomUp');if(up)up.onclick=roomUpgrade;
+  const cl=document.getElementById('roomClose');if(cl)cl.onclick=()=>{sfx.click();hideModal();};
+}
+function roomBuy(id){const u=me();const it=curTier(u).items.find(x=>x.id===id);if(!it||u.room.owned[id]||u.coins<it.cost)return;
+  u.coins-=it.cost;u.room.owned[id]=true;u.room.shown[id]=true;if(it.benefit&&(!u.room.plant||(u.room.plant.stage||0)<1))u.room.plant={stage:1,last:0};
+  saveDB();sfx.coin();toast(it.emoji+' Koupeno: '+it.name);roomRefresh();refreshChrome();showModal(roomShopHTML());wireRoomShop();}
+function roomToggle(id){const u=me();if(!u.room.owned[id])return;u.room.shown[id]=(u.room.shown[id]===false);saveDB();sfx.click();roomRefresh();showModal(roomShopHTML());wireRoomShop();}
+function roomUpgrade(){const u=me();const t=(u.room.tier||0);const tier=ROOM_TIERS[t];if(!roomAllOwned(u)||tier.nextCost==null||u.coins<tier.nextCost)return;sfx.click();
+  showModal(`<div style="font-size:52px;text-align:center;margin:2px 0">⬆️</div><h2>Upgradovat kancelář?</h2><p>Přejdeš na <b>${ROOM_TIERS[t+1].name}</b>. Kancelář se vyprázdní a v obchodě budou <b>nové předměty</b>. Cena: ${tier.nextCost} 🪙.</p>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="upCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="upOk" style="flex:1;background:linear-gradient(135deg,#39c07c,#1f9d5f)">Upgradovat</button></div>`);
+  document.getElementById('upCancel').onclick=()=>{sfx.click();showModal(roomShopHTML());wireRoomShop();};
+  document.getElementById('upOk').onclick=()=>{u.coins-=tier.nextCost;u.room.tier=t+1;u.room.owned={};u.room.shown={};u.room.plant={stage:0,last:0};u.room.wall=ROOM_TIERS[t+1].wall;u.room.floor=ROOM_TIERS[t+1].floor;saveDB();sfx.level();hideModal();toast('🎉 Nová kancelář: '+ROOM_TIERS[t+1].name);roomRefresh();refreshChrome();};
+}
+function giftModal(uname){const u=DB.users[uname];if(!u)return;sfx.click();
+  showModal(`<h2>🎁 Darovat mince</h2><p style="margin-bottom:8px">Operátor: <b>${esc(u.display)}</b></p>
+    <div class="field"><label>Počet mincí</label><input id="gAmt" type="number" min="1" max="9999" value="50"></div>
+    <div class="field"><label>Zpráva (nepovinné)</label><textarea id="gMsg" rows="2" placeholder="Např. Skvělá práce tento týden!"></textarea></div>
+    <div class="err" id="gErr"></div>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="gCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="gSave" style="flex:1">Poslat dárek</button></div>`);
+  document.getElementById("gCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("gSave").onclick=()=>{const amt=Math.max(0,parseInt(document.getElementById("gAmt").value)||0);const msg=(document.getElementById("gMsg").value||"").trim();
+    if(amt<=0){document.getElementById("gErr").textContent="Zadej kladný počet mincí.";return;}
+    u.coins+=amt;u.notifications=u.notifications||[];u.notifications.push({coins:amt,message:msg,ts:Date.now()});
+    saveDB();sfx.coin();hideModal();toast("🎁 Posláno "+amt+" 🪙 → "+u.display);renderAdmin();};
+}
+function checkNotifications(){const u=me();if(!u||!u.notifications||!u.notifications.length)return;
+  const notes=u.notifications.slice();u.notifications=[];saveDB();
+  const total=notes.reduce((a,n)=>a+(n.coins||0),0);
+  const list=notes.map(n=>`<div style="background:#fff7e0;border:2px solid #ffe6a8;border-radius:14px;padding:11px 13px;margin-bottom:8px;text-align:left"><div style="font-weight:800;color:#b7791f">🎁 +${n.coins} 🪙</div>${n.message?`<div style="font-weight:700;color:var(--ink2);font-size:13px;margin-top:3px">„${esc(n.message)}"</div>`:''}<div style="font-size:11px;color:var(--ink2);font-weight:700;margin-top:3px">od administrátora · ${fmtWhen(n.ts)}</div></div>`).join("");
+  sfx.level();
+  showModal(`${confetti()}<div style="font-size:60px;text-align:center;margin:2px 0">🎁</div><h2>Máš dárek!</h2>
+    <p>Administrátor ti poslal ${notes.length>1?'dárky':'dárek'} v celkové hodnotě <b>${total} 🪙</b>.</p>${list}
+    <button class="modalBtn" id="okGift">Super, děkuju! 🎉</button>`);
+  document.getElementById("okGift").onclick=()=>{sfx.coin();hideModal();renderUser();};
+}
+function renderAdmin(){
+  const u=me();const tabs=[["users","👥 Uživatelé"],["mandatory","📋 Povinná školení"],["elearning","🎓 E-learning"],["activity","📈 Aktivita"]];
+  app.innerHTML=`${topbar(u)}<div class="tabbar">${tabs.map(t=>`<button class="tab ${state.adminTab===t[0]?'on':''}" data-atab="${t[0]}">${t[1]}</button>`).join("")}</div><main id="main"></main>`;
+  wireChrome();
+  document.querySelectorAll("[data-atab]").forEach(b=>b.onclick=()=>{sfx.click();state.adminTab=b.dataset.atab;renderAdmin();});
+  const m=document.getElementById("main");
+  if(state.adminTab==="users")renderAdminUsers(m);else if(state.adminTab==="mandatory")renderAdminMandatory(m);else if(state.adminTab==="elearning")renderAdminElearning(m);else renderAdminActivity(m);
+}
+function renderAdminUsers(m){
+  const users=Object.keys(DB.users).filter(k=>DB.users[k].role==="user");
+  let html=`<div class="screen"><div class="panel"><div class="headRow"><h2><span class="ic" style="background:#4f9dff22">👥</span> Operátoři</h2><button class="miniBtn add" id="newUserBtn">+ Nový operátor</button></div>
+    <div class="subtle">Zakládej účty operátorů a schvaluj jejich povinná školení. Po zaškrtnutí se připíšou mince a operátor může postoupit.</div>`;
+  if(!users.length)html+=`<div class="empty">Zatím žádní operátoři. Založ prvního tlačítkem „+ Nový operátor".</div>`;
+  users.forEach(uname=>{const u=DB.users[uname];const L=userLevel(u);const cfg=avatarConfig(u);const open=state.adminOpenUser===uname;
+    const totalM=DB.mandatory.length;const doneM=DB.mandatory.filter(t=>u.mandatory[t.id]==='completed').length;
+    html+=`<div class="adminUser"><div class="adminUserHead" data-open="${uname}"><div class="aAv">${operatorSVG(cfg)}</div>
+      <div class="rMain" style="flex:1"><div style="font-weight:800;font-size:14.5px">${esc(u.display)} <span style="color:var(--ink2);font-weight:700;font-size:11px">(${esc(uname)})</span></div>
+        <div style="font-size:11.5px;margin-top:2px"><span class="miniStat">Lvl ${L}</span><span class="miniStat">${u.coins} 🪙</span><span class="miniStat">${doneM}/${totalM} školení</span></div></div>
+      <div style="font-size:18px">${open?'▲':'▼'}</div></div><div class="adminUserBody ${open?'open':''}">`;
+    if(open){html+=`<button class="miniBtn add" data-gift="${uname}" style="margin:2px 0 10px;width:100%;padding:10px">🎁 Darovat mince</button>`;const maxL=highestDefinedLevel();for(let lv=1;lv<=maxL;lv++){const req=mandatoryForLevel(lv);if(!req.length)continue;
+      html+=`<div class="lvlChip" style="margin:6px 0 6px">Úroveň ${lv}</div>`;
+      req.forEach(t=>{const done=u.mandatory[t.id]==='completed';html+=`<div class="checkRow"><div class="chk ${done?'on':''}" data-toggle="${uname}|${t.id}">${done?'✓':''}</div><div class="cInfo"><div class="t">${esc(t.title)}</div><div class="d">📅 ${fmtDate(t.date)} · +${t.coins} 🪙</div></div></div>`;});}}
+    html+=`</div></div>`;});
+  html+=`</div></div>`;m.innerHTML=html;
+  document.getElementById("newUserBtn").onclick=createUserModal;
+  m.querySelectorAll("[data-open]").forEach(h=>h.onclick=()=>{const un=h.dataset.open;state.adminOpenUser=state.adminOpenUser===un?null:un;sfx.click();renderAdmin();});
+  m.querySelectorAll("[data-toggle]").forEach(c=>c.onclick=()=>{const p=c.dataset.toggle.split("|");toggleMandatory(p[0],p[1]);});
+  m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>giftModal(b.dataset.gift));
+}
+function createUserModal(){sfx.click();
+  showModal(`<h2>Nový operátor</h2><div class="field"><label>Přihlašovací jméno</label><input id="nuUser" autocomplete="off" placeholder="např. novak"></div>
+    <div class="field"><label>Zobrazované jméno</label><input id="nuDisp" autocomplete="off" placeholder="Jan Novák"></div>
+    <div class="field"><label>Heslo</label><input id="nuPass" placeholder="heslo"></div><div class="err" id="nuErr"></div>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="nuCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="nuSave" style="flex:1">Vytvořit účet</button></div>`);
+  document.getElementById("nuCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("nuSave").onclick=()=>{const uname=(document.getElementById("nuUser").value||"").trim().toLowerCase();const disp=(document.getElementById("nuDisp").value||"").trim()||uname;const pass=(document.getElementById("nuPass").value||"").trim();const err=document.getElementById("nuErr");
+    if(!uname||!pass){err.textContent="Vyplň jméno i heslo.";return;}if(DB.users[uname]){err.textContent="Takové jméno už existuje.";return;}
+    DB.users[uname]=newUser(uname,pass,disp);saveDB();sfx.coin();hideModal();toast("👤 Účet vytvořen: "+disp);state.adminOpenUser=uname;renderAdmin();};
+}
+function toggleMandatory(uname,tid){const u=DB.users[uname];const t=DB.mandatory.find(x=>x.id===tid);if(!u||!t)return;const prevL=userLevel(u);
+  if(u.mandatory[tid]==='completed'){delete u.mandatory[tid];sfx.click();}else{u.mandatory[tid]='completed';if(!u.awarded[tid]){u.coins+=t.coins;u.awarded[tid]=true;}sfx.coin();}
+  saveDB();const newL=userLevel(u);if(newL>prevL){sfx.level();toast("🎉 "+esc(u.display)+" postoupil na Level "+newL+"!");}renderAdmin();}
+function renderAdminMandatory(m){const maxL=Math.max(highestDefinedLevel(),5);let byLevel="";
+  for(let L=1;L<=maxL;L++){const req=mandatoryForLevel(L);
+    byLevel+=`<div class="headRow" style="margin:16px 2px 8px"><div class="catTitle" style="margin:0">📊 Úroveň ${L} <span class="lvlChip" style="margin-left:6px">${req.length}</span></div><button class="miniBtn add" data-addlvl="${L}">+ Přidat školení</button></div>`;
+    if(!req.length)byLevel+=`<div class="empty" style="padding:8px">Žádné školení.</div>`;
+    req.forEach(t=>{byLevel+=`<div class="editRow"><div class="eInfo"><div class="t">${esc(t.title)}</div><div class="d">📅 ${fmtDate(t.date)} · +${t.coins} 🪙 · ${esc(clip(t.desc,60))}</div></div><button class="miniBtn edit" data-edit="${t.id}">Upravit</button><button class="miniBtn del" data-del="${t.id}">Smazat</button></div>`;});}
+  m.innerHTML=`<div class="screen"><div class="panel"><h2><span class="ic" style="background:#39c07c22">✏️</span> Editor povinných školení</h2><div class="subtle">Přidávej a upravuj povinná školení po úrovních. Změny se okamžitě promítnou operátorům.</div>${byLevel}</div></div>`;
+  m.querySelectorAll("[data-addlvl]").forEach(b=>b.onclick=()=>editTraining(null,parseInt(b.dataset.addlvl)));
+  m.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editTraining(b.dataset.edit));
+  m.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>delTraining(b.dataset.del));
+}
+function editTraining(id,presetLevel){const existing=id?DB.mandatory.find(x=>x.id===id):null;
+  const t=existing||{title:"",date:new Date().toISOString().slice(0,10),coins:30,level:presetLevel||1,desc:""};sfx.click();
+  showModal(`<h2>${existing?'Upravit školení':'Nové školení'}</h2><div class="field"><label>Název školení</label><input id="eTitle" value="${esc(t.title)}" placeholder="např. Reklamační proces"></div>
+    <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>Termín</label><input id="eDate" type="date" value="${t.date}"></div><div class="field" style="width:80px"><label>Úroveň</label><input id="eLevel" type="number" min="1" max="20" value="${t.level}"></div><div class="field" style="width:90px"><label>Mince</label><input id="eCoins" type="number" min="0" max="999" value="${t.coins}"></div></div>
+    <div class="field"><label>Popis (o čem školení bude)</label><textarea id="eDesc" rows="3" placeholder="Krátký popis obsahu…">${esc(t.desc)}</textarea></div><div class="err" id="eErr"></div>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="eCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="eSave" style="flex:1">${existing?'Uložit':'Přidat'}</button></div>`);
+  document.getElementById("eCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("eSave").onclick=()=>{const title=(document.getElementById("eTitle").value||"").trim();const date=document.getElementById("eDate").value||"";const level=Math.max(1,parseInt(document.getElementById("eLevel").value)||1);const coins=Math.max(0,parseInt(document.getElementById("eCoins").value)||0);const desc=(document.getElementById("eDesc").value||"").trim();
+    if(!title){document.getElementById("eErr").textContent="Zadej název školení.";return;}
+    if(existing){existing.title=title;existing.date=date;existing.level=level;existing.coins=coins;existing.desc=desc;}else DB.mandatory.push({id:"m_"+Date.now().toString(36),title,date,level,coins,desc});
+    saveDB();sfx.coin();hideModal();toast("💾 Uloženo");renderAdmin();};
+}
+function delTraining(id){const t=DB.mandatory.find(x=>x.id===id);if(!t)return;sfx.click();
+  showModal(`<div style="font-size:48px;text-align:center;margin:2px 0">🗑️</div><h2>Smazat školení?</h2><p>„${esc(t.title)}" bude odstraněno. Připsané mince operátorům zůstanou.</p>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="dCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="dOk" style="flex:1;background:linear-gradient(135deg,#ff6b6b,#ff8a5b)">Smazat</button></div>`);
+  document.getElementById("dCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("dOk").onclick=()=>{DB.mandatory=DB.mandatory.filter(x=>x.id!==id);Object.values(DB.users).forEach(u=>{if(u.mandatory)delete u.mandatory[id];if(u.awarded)delete u.awarded[id];});saveDB();sfx.click();hideModal();toast("🗑️ Smazáno");renderAdmin();};
+}
+let draftModule=null;
+function renderAdminElearning(m){
+  let rows=DB.elearning.map(el=>`<div class="editRow"><div class="eInfo"><div class="t">${el.icon||'🎓'} ${esc(el.title)}</div><div class="d">${(el.q||[]).length} scénářů · Lvl ${el.level||1} · +${el.coins} 🪙</div></div><button class="miniBtn edit" data-eledit="${el.id}">Upravit</button><button class="miniBtn del" data-eldel="${el.id}">Smazat</button></div>`).join("")||'<div class="empty">Zatím žádné e-learningy.</div>';
+  m.innerHTML=`<div class="screen"><div class="panel"><div class="headRow"><h2><span class="ic" style="background:#9b7bff22">🎓</span> Editor e-learningu</h2><button class="miniBtn add" id="newElBtn">+ Nový e-learning</button></div>
+    <div class="subtle">Vytvářej interaktivní školení: každý scénář má náladu zákazníka, jeho repliku, situaci, otázku, odpovědi a zpětnou vazbu.</div>${rows}</div></div>`;
+  document.getElementById("newElBtn").onclick=()=>openModuleEditor(null);
+  m.querySelectorAll("[data-eledit]").forEach(b=>b.onclick=()=>openModuleEditor(b.dataset.eledit));
+  m.querySelectorAll("[data-eldel]").forEach(b=>b.onclick=()=>delModule(b.dataset.eldel));
+}
+function openModuleEditor(id){sfx.click();const ex=id?DB.elearning.find(x=>x.id===id):null;
+  draftModule=ex?JSON.parse(JSON.stringify(ex)):{id:"el_"+Date.now().toString(36),title:"",icon:"🎓",color:"#9b7bff",coins:25,level:1,q:[]};showModuleEditor(!!ex);}
+function readModuleFields(){const t=document.getElementById("mmTitle");if(!t)return;draftModule.title=t.value.trim();draftModule.icon=(document.getElementById("mmIcon").value||"🎓").trim()||"🎓";draftModule.coins=Math.max(0,parseInt(document.getElementById("mmCoins").value)||0);draftModule.level=Math.max(1,parseInt(document.getElementById("mmLevel").value)||1);}
+function showModuleEditor(isEdit){const dm=draftModule;
+  const qlist=dm.q.map((q,i)=>`<div class="qEditRow"><div class="qi"><div class="t">${i+1}. ${esc(clip(q.q||'(bez otázky)',42))}</div><div style="color:var(--ink2)">${(MOODS[q.mood]||MOODS.klidny).label} · „${esc(clip(q.cust||'',34))}"</div></div><button class="miniBtn edit" data-qedit="${i}">Upravit</button><button class="miniBtn del" data-qdel="${i}">✕</button></div>`).join("")||'<div class="empty" style="padding:8px">Zatím žádné scénáře. Přidej první ↓</div>';
+  showModal(`<h2>${isEdit?'Upravit e-learning':'Nový e-learning'}</h2>
+    <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>Název</label><input id="mmTitle" value="${esc(dm.title)}" placeholder="např. Práce s reklamací"></div><div class="field" style="width:70px"><label>Ikona</label><input id="mmIcon" value="${esc(dm.icon)}" maxlength="2"></div><div class="field" style="width:70px"><label>Úroveň</label><input id="mmLevel" type="number" min="1" max="20" value="${dm.level||1}"></div><div class="field" style="width:80px"><label>Mince</label><input id="mmCoins" type="number" min="0" max="999" value="${dm.coins}"></div></div>
+    <div class="catTitle" style="margin:6px 2px 6px">Scénáře</div>${qlist}<button class="miniBtn add" id="addQ" style="width:100%;padding:10px;margin-top:6px">+ Přidat scénář</button><div class="err" id="mmErr"></div>
+    <div style="display:flex;gap:10px;margin-top:6px"><button class="modalBtn grey" id="mmCancel" style="flex:1">Zavřít</button><button class="modalBtn" id="mmSave" style="flex:1">Uložit e-learning</button></div>`);
+  document.getElementById("addQ").onclick=()=>{readModuleFields();openQuestionEditor(-1);};
+  document.getElementById("mmCancel").onclick=()=>{sfx.click();hideModal();draftModule=null;};
+  document.getElementById("mmSave").onclick=()=>{readModuleFields();if(!draftModule.title){document.getElementById("mmErr").textContent="Zadej název e-learningu.";return;}if(!draftModule.q.length){document.getElementById("mmErr").textContent="Přidej aspoň jeden scénář.";return;}
+    const idx=DB.elearning.findIndex(x=>x.id===draftModule.id);if(idx>=0)DB.elearning[idx]=draftModule;else DB.elearning.push(draftModule);saveDB();sfx.coin();hideModal();draftModule=null;toast("💾 E-learning uložen");renderAdmin();};
+  document.querySelectorAll("[data-qedit]").forEach(b=>b.onclick=()=>{readModuleFields();openQuestionEditor(parseInt(b.dataset.qedit));});
+  document.querySelectorAll("[data-qdel]").forEach(b=>b.onclick=()=>{readModuleFields();draftModule.q.splice(parseInt(b.dataset.qdel),1);sfx.click();showModuleEditor(isEdit);});
+}
+function openQuestionEditor(qi){const isNew=qi<0;const q=isNew?{mood:"klidny",cust:"",sc:"",q:"",a:["","",""],correct:0,good:"",bad:""}:JSON.parse(JSON.stringify(draftModule.q[qi]));
+  while(q.a.length<3)q.a.push("");
+  const moodOpts=MOOD_KEYS.map(k=>`<option value="${k}" ${q.mood===k?'selected':''}>${MOODS[k].label}</option>`).join("");
+  const corrOpts=q.a.map((_,i)=>`<option value="${i}" ${q.correct===i?'selected':''}>${String.fromCharCode(65+i)}</option>`).join("");
+  showModal(`<h2>${isNew?'Nový scénář':'Upravit scénář'}</h2>
+    <div style="display:flex;gap:10px"><div class="field" style="flex:1"><label>Nálada zákazníka</label><select id="qMood">${moodOpts}</select></div><div class="field" style="width:120px"><label>Správná odpověď</label><select id="qCorr">${corrOpts}</select></div></div>
+    <div class="field"><label>Replika zákazníka</label><textarea id="qCust" rows="2" placeholder="Co zákazník řekne…">${esc(q.cust)}</textarea></div>
+    <div class="field"><label>Situace</label><input id="qSc" value="${esc(q.sc)}" placeholder="Krátký popis situace"></div>
+    <div class="field"><label>Otázka pro operátora</label><input id="qQ" value="${esc(q.q)}" placeholder="Co uděláš?"></div>
+    <div class="field"><label>Odpověď A</label><input id="qA0" value="${esc(q.a[0])}"></div><div class="field"><label>Odpověď B</label><input id="qA1" value="${esc(q.a[1])}"></div><div class="field"><label>Odpověď C</label><input id="qA2" value="${esc(q.a[2])}"></div>
+    <div class="field"><label>Zpětná vazba – správně</label><input id="qGood" value="${esc(q.good)}" placeholder="Proč je to dobře"></div><div class="field"><label>Zpětná vazba – špatně</label><input id="qBad" value="${esc(q.bad)}" placeholder="Jak to má být"></div>
+    <div class="err" id="qErr"></div><div style="display:flex;gap:10px"><button class="modalBtn grey" id="qCancel" style="flex:1">Zpět</button><button class="modalBtn" id="qSave" style="flex:1">${isNew?'Přidat':'Uložit'}</button></div>`);
+  document.getElementById("qCancel").onclick=()=>{sfx.click();showModuleEditor(DB.elearning.some(x=>x.id===draftModule.id));};
+  document.getElementById("qSave").onclick=()=>{const a=[document.getElementById("qA0").value.trim(),document.getElementById("qA1").value.trim(),document.getElementById("qA2").value.trim()];
+    const nq={mood:document.getElementById("qMood").value,cust:document.getElementById("qCust").value.trim(),sc:document.getElementById("qSc").value.trim(),q:document.getElementById("qQ").value.trim(),a,correct:parseInt(document.getElementById("qCorr").value)||0,good:document.getElementById("qGood").value.trim(),bad:document.getElementById("qBad").value.trim()};
+    if(!nq.cust||!nq.q||a.some(x=>!x)){document.getElementById("qErr").textContent="Vyplň repliku, otázku a všechny 3 odpovědi.";return;}
+    if(isNew)draftModule.q.push(nq);else draftModule.q[qi]=nq;sfx.coin();showModuleEditor(DB.elearning.some(x=>x.id===draftModule.id));};
+}
+function delModule(id){const el=DB.elearning.find(x=>x.id===id);if(!el)return;sfx.click();
+  showModal(`<div style="font-size:48px;text-align:center;margin:2px 0">🗑️</div><h2>Smazat e-learning?</h2><p>„${esc(el.title)}" bude odstraněn.</p>
+    <div style="display:flex;gap:10px"><button class="modalBtn grey" id="dCancel" style="flex:1">Zrušit</button><button class="modalBtn" id="dOk" style="flex:1;background:linear-gradient(135deg,#ff6b6b,#ff8a5b)">Smazat</button></div>`);
+  document.getElementById("dCancel").onclick=()=>{sfx.click();hideModal();};
+  document.getElementById("dOk").onclick=()=>{DB.elearning=DB.elearning.filter(x=>x.id!==id);saveDB();sfx.click();hideModal();toast("🗑️ Smazáno");renderAdmin();};
+}
+function renderAdminActivity(m){
+  const purchases=DB.activity.filter(a=>a.type==='purchase');const results=DB.results;
+  const pHtml=purchases.length?purchases.map(a=>`<div class="logRow"><div class="lEm">${a.emoji}</div><div class="lMain"><div class="t">${esc(a.display)} koupil/a ${esc(a.item)}</div><div class="d">−${a.cost} 🪙</div></div><div class="lTime">${fmtWhen(a.ts)}</div></div>`).join(""):'<div class="empty">Zatím žádné nákupy.</div>';
+  const rHtml=results.length?results.map(r=>{const mist=r.mistakes&&r.mistakes.length?`<details class="resDetails"><summary>Zobrazit chyby (${r.mistakes.length})</summary>${r.mistakes.map(mm=>`<div class="mistake"><div class="mq">❓ ${esc(mm.q)}</div><div class="bad">✗ Zvolil/a: ${esc(mm.chosen)}</div><div class="ok">✓ Správně: ${esc(mm.correct)}</div></div>`).join("")}</details>`:'<div class="subtle" style="margin:6px 0 0">Bez chyb 🎉</div>';
+    return `<div style="background:#fff;border:2px solid var(--cardline);border-radius:14px;padding:12px 14px;margin-bottom:10px"><div class="headRow"><div style="font-weight:800;font-size:14px">${esc(r.display)} · ${esc(r.title)}</div><div class="lTime">${fmtWhen(r.ts)}</div></div>
+      <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><span class="${r.passed?'pillGreen':'pillGrey'}">${r.passed?'✓ splněno':'nesplněno'}</span><span class="miniStat">⏱ ${fmtDur(r.durationSec)}</span><span class="miniStat">🎯 ${r.correct}/${r.total} (${r.percent}%)</span><span class="miniStat">✗ chyb: ${r.mistakes?r.mistakes.length:0}</span></div>${mist}</div>`;}).join(""):'<div class="empty">Zatím žádné výsledky e-learningu.</div>';
+  m.innerHTML=`<div class="screen"><div class="panel"><h2><span class="ic" style="background:#ff6f9122">🛍️</span> Nákupy v e-shopu</h2><div class="subtle">Přehled toho, co si operátoři koupili za mince (nejnovější nahoře).</div>${pHtml}</div>
+    <div class="panel" style="margin-bottom:0"><h2><span class="ic" style="background:#9b7bff22">🎓</span> Výsledky e-learningu</h2><div class="subtle">Jak dlouho školení trvalo, kolik operátor získal bodů a jaké dělal chyby.</div>${rHtml}</div></div>`;
+}
+
+/* ---------- MODAL / UTILS ---------- */
+function showModal(html){document.getElementById("modal").innerHTML=html;document.getElementById("overlay").classList.add("show");}
+function hideModal(){document.getElementById("overlay").classList.remove("show");}
+let toastT=null;
+function toast(msg){const t=document.getElementById("toast");t.innerHTML=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2400);}
+function confetti(){let c="";for(let i=0;i<24;i++){const col=['#ff6f91','#4f9dff','#39c07c','#ffcf4d','#9b7bff'][i%5];c+=`<div class="confetti" style="left:${Math.random()*100}%;background:${col};animation:conf ${1+Math.random()}s ease-in ${Math.random()*.5}s forwards"></div>`;}return c;}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function clip(s,n){s=String(s||"");return s.length>n?s.slice(0,n)+"…":s;}
+function fmtDate(d){if(!d)return"—";const p=String(d).split("-");return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:d;}
+function fmtDur(sec){sec=Math.round(sec||0);const m=Math.floor(sec/60),s=sec%60;return m>0?`${m}:${String(s).padStart(2,'0')} min`:`${s} s`;}
+function fmtWhen(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return `${p(d.getDate())}.${p(d.getMonth()+1)}. ${p(d.getHours())}:${p(d.getMinutes())}`;}
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay"){if(draftModule&&document.getElementById("mmTitle"))return;hideModal();}});
+
+(function(){const sc=document.getElementById("scene");for(let i=0;i<9;i++){const b=document.createElement("div");b.className="bubble-bg";const s=20+Math.random()*70;b.style.width=s+"px";b.style.height=s+"px";b.style.left=Math.random()*100+"%";b.style.animationDuration=(14+Math.random()*16)+"s";b.style.animationDelay=(-Math.random()*20)+"s";sc.appendChild(b);}})();
+
+render();
+</script>
+</body>
+</html>
